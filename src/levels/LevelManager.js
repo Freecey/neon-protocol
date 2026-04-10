@@ -1,28 +1,59 @@
 // 🎮 Level Manager
-// Handles level generation and enemy placement
+// Handles level generation and enemy placement (v4.0 avec Lvl 6-7)
+
+import Boss from '../entities/Boss.js';
+import Level6 from './Level6.js';
+import Level7 from './Level7.js';
 
 export default class LevelManager {
   constructor() {
+    this.level = 1;
+    this.currentLevel = null;
     this.enemies = [];
     this.coins = [];
     this.platforms = [];
     this.powerups = [];
     this.boss = null;
+    this.bosses = [];
     this.screenWidth = window.innerWidth;
     this.screenHeight = window.innerHeight;
   }
   
-  loadLevel(level) {
+  loadLevel(levelNum) {
+    this.level = levelNum;
     this.screenHeight = document.getElementById('canvas')?.height || window.innerHeight;
     this.screenWidth = document.getElementById('canvas')?.width || window.innerWidth;
     
-    this.platforms = this.generatePlatforms(this.screenWidth, this.screenHeight, level);
-    this.enemies = this.generateEnemies(level, this.platforms);
-    this.coins = this.generateCoins(this.platforms, level);
-    this.powerups = this.generatePowerups(level);
+    // Niveau 6 et 7 - Classes spécialisées
+    if (levelNum === 6) {
+      this.currentLevel = new Level6(this.screenWidth, this.screenHeight);
+      this.currentLevel.generate();
+      this.platforms = this.currentLevel.platforms;
+      this.enemies = this.currentLevel.enemies;
+      this.coins = this.currentLevel.coins;
+      this.powerups = this.currentLevel.powerups;
+      return;
+    }
     
-    // Boss level
-    if (level >= 3) {
+    if (levelNum === 7) {
+      this.currentLevel = new Level7(this.screenWidth, this.screenHeight);
+      this.currentLevel.generate();
+      this.platforms = this.currentLevel.platforms;
+      this.enemies = this.currentLevel.enemies;
+      this.coins = this.currentLevel.coins;
+      this.powerups = this.currentLevel.powerups;
+      this.bosses = this.currentLevel.getBosses();
+      return;
+    }
+    
+    // Niveaux 1-5 - Générateur ancien
+    this.platforms = this.generatePlatforms(this.screenWidth, this.screenHeight, levelNum);
+    this.enemies = this.generateEnemies(levelNum, this.platforms);
+    this.coins = this.generateCoins(this.platforms, levelNum);
+    this.powerups = this.generatePowerups(levelNum, this.platforms);
+    
+    // Boss niveau
+    if (levelNum >= 3 && levelNum <= 5) {
       this.generateBoss();
     }
   }
@@ -121,8 +152,33 @@ export default class LevelManager {
     return coins;
   }
   
-  generatePowerups(level) {
+  generatePowerups(platforms, level) {
     const powerups = [];
+    
+    // Niveaux 6-7: New power-ups
+    if (level === 6) {
+      powerups.push({
+        x: this.screenWidth / 2,
+        y: 150,
+        type: 'timeStop',
+        collected: false
+      });
+      return powerups;
+    }
+    
+    if (level === 7) {
+      // 7 power-ups niveau 7
+      return [
+        { x: 100, y: 100, type: 'doubleJump', collected: false },
+        { x: this.screenWidth - 100, y: 150, type: 'shield', collected: false },
+        { x: this.screenWidth / 2 - 50, y: 300, type: 'speed', collected: false },
+        { x: this.screenWidth / 2 + 50, y: 200, type: 'timeStop', collected: false },
+        { x: 150, y: 250, type: 'magnet', collected: false },
+        { x: this.screenWidth - 150, y: 350, type: 'invisibility', collected: false }
+      ];
+    }
+    
+    // Niveaux 1-5: Anciens power-ups
     const powerupTypes = ['doubleJump', 'shield', 'speed', 'freeze'];
     const powerupCount = 1 + Math.floor(level / 2);
     
@@ -139,6 +195,41 @@ export default class LevelManager {
     }
     
     return powerups;
+  }
+  
+  update(delta) {
+    if (this.currentLevel) {
+      this.currentLevel.update?.(delta);
+    }
+    
+    // Update boss projectiles
+    if (this.bosses) {
+      this.bosses.forEach(boss => {
+        if (boss.getProjectiles) {
+          const projectiles = boss.getProjectiles();
+          // Update projectiles logic here
+        }
+      });
+    }
+  }
+  
+  render(ctx) {
+    if (this.currentLevel) {
+      this.currentLevel.render(ctx);
+    } else {
+      // Render platforms
+      this.platforms.forEach(plat => {
+        ctx.fillStyle = '#333';
+        ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+      });
+    }
+  }
+  
+  getBosses() {
+    if (this.bosses && this.bosses.length > 0) {
+      return this.bosses;
+    }
+    return this.boss ? [this.boss] : [];
   }
   
   resize(width, height) {
