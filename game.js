@@ -448,6 +448,8 @@ function checkCollision(obj1, obj2) {
 
 // Game control functions
 function startGame() {
+  if (document.getElementById('level-transition')) document.getElementById('level-transition').remove();
+  
   document.getElementById('start-screen').classList.add('hidden');
   document.getElementById('game-over-screen').classList.add('hidden');
   document.getElementById('score-board').classList.remove('hidden');
@@ -469,15 +471,43 @@ function startGame() {
 
 function gameOver(won) {
   gameState.running = false;
+  
+  // Si le joueur a survécu et qu'on peut passer au niveau suivant
+  if (won && gameState.level < 5) {
+    const transitionMsg = document.createElement('div');
+    transitionMsg.id = 'level-transition';
+    transitionMsg.style.position = 'fixed';
+    transitionMsg.style.top = '50%';
+    transitionMsg.style.left = '50%';
+    transitionMsg.style.transform = 'translate(-50%, -50%)';
+    transitionMsg.style.fontSize = '48px';
+    transitionMsg.style.color = '#00BCD4';
+    transitionMsg.style.fontWeight = 'bold';
+    transitionMsg.style.textShadow = '0 0 20px #00BCD4';
+    transitionMsg.style.zIndex = '1000';
+    transitionMsg.style.padding = '20px';
+    transitionMsg.style.background = 'rgba(0,0,0,0.8)';
+    transitionMsg.style.borderRadius = '10px';
+    transitionMsg.innerHTML = `NIVEAU ${gameState.level} TERMINÉ !<br>Prêt pour le niveau ${gameState.level + 1}?`;
+    document.body.appendChild(transitionMsg);
+    
+    setTimeout(() => {
+      startNextLevel();
+      transitionMsg.remove();
+    }, 2000);
+    
+    return;
+  }
+  
   document.getElementById('game-over-screen').classList.remove('hidden');
   
   const title = document.getElementById('game-over-title');
   const message = document.getElementById('game-over-message');
   
   if (won) {
-    title.textContent = '🎉 Victoire !';
+    title.textContent = '🎉 Victoire Totale !';
     title.style.color = '#FFD700';
-    message.textContent = `Temps restant: ${Math.floor(gameState.timeLeft)}s - Score: ${gameState.score}`;
+    message.textContent = `Score final: ${gameState.score} - FÉLICITIONS! Vous avez terminé tous les niveaux!`;
   } else {
     title.textContent = '💀 Game Over';
     title.style.color = '#FF6B6B';
@@ -491,6 +521,8 @@ function restartGame() {
   gameState.score = 0;
   gameState.timeLeft = 60;
   
+  if (document.getElementById('level-transition')) document.getElementById('level-transition').remove();
+  
   document.getElementById('start-screen').classList.remove('hidden');
   document.getElementById('game-over-screen').classList.add('hidden');
   document.getElementById('score-board').classList.add('hidden');
@@ -501,6 +533,24 @@ function restartGame() {
   
   initLevel();
   render();
+}
+
+function startNextLevel() {
+  gameState.level++;
+  gameState.score = 0;
+  gameState.timeLeft = 60 + (gameState.level - 1) * 10;
+  gameState.running = true;
+  gameState.lastTime = performance.now();
+  
+  document.getElementById('score-board').classList.remove('hidden');
+  document.getElementById('level-info').classList.remove('hidden');
+  document.getElementById('timer').classList.remove('hidden');
+  document.getElementById('controls-hint').classList.remove('hidden');
+  document.getElementById('health-bar').classList.remove('hidden');
+  document.getElementById('level').textContent = gameState.level;
+  
+  initLevel();
+  requestAnimationFrame(gameLoop);
 }
 
 // Initialize
