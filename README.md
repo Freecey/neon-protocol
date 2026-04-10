@@ -17,11 +17,36 @@
 
 ## 🚀 Quick Start
 
+### 🪟 **Windows (JP - NO NPM INSTALLATION)**
+
+**TL;DR:** Double-clique sur **`play.bat`**! 👇
+
+1. **Télécharge** le repo: https://github.com/Freecey/neon-protocol
+2. **Dézippe** dans un dossier (`C:\Games\neon-protocol`)
+3. **Double-clique** sur **`play.bat`**
+4. **Le navigateur s'ouvre** → http://localhost:8081
+5. **Clique** sur **"Commencer"**
+6. **JOUE !** 🎮
+
+**Besoin d'installer quelque chose?**
+- Si `play.bat` ne marche pas → Installe Node.js (voir [GUIDE-JP.md](GUIDE-JP.md))
+- Sinon → **JOUEZ!** C'est tout!
+
+### 🐧 **Linux/Mac (avec npx)**
+
 ```bash
 cd projects/rush-platformer
 npx serve . -l 8081
 ```
 → **http://localhost:8081**
+
+---
+
+## 📖 Documentation
+
+- 📘 **[GUIDE-JP.md](GUIDE-JP.md)** - Guide complet pour JP (Windows, sans connaissances)
+- 🔧 **[DEPLOY-ISPCONFIG.md](DEPLOY-ISPCONFIG.md)** - Déploiement production (ISPConfig)
+- 🏗️ **[ARCHITECTURE.md](ARCHITECTURE.md)** - Architecture technique
 
 ---
 
@@ -110,168 +135,18 @@ npx serve . -l 8081
 
 ---
 
-## 🏗️ Architecture
+## 📞 Support & Credits
 
-```
-neon-protocol/
-├── src/
-│   ├── main.js              # Entry point
-│   ├── Game.js              # Core loop
-│   ├── entities/
-│   │   ├── Player.js        # Stats + controls
-│   │   ├── Enemy.js         # AI behaviors
-│   │   ├── Boss.js          # Boss fight logic
-│   │   ├── Coin.js          # Collectible
-│   │   ├── PowerUp.js       # Bonus system
-│   │   └── Particle.js      # VFX
-│   ├── systems/
-│   │   ├── Physics.js       # Collision detection
-│   │   ├── Timer.js         # Countdown
-│   │   ├── Input.js         # Keyboard handler
-│   │   └── AudioSystem.js   # Web Audio API
-│   ├── ui/
-│   │   └── UIManager.js     # UI management
-│   └── levels/
-│       └── LevelManager.js  # Gen logic
-├── index.html               # Kyra branded UI
-├── package.json
-├── DEPLOY-ISPCONFIG.md     # ISPConfig guide
-├── ARCHITECTURE.md         # Tech docs
-└── README.md               # This file
-```
+**Pour JP:**
+- **Aide:** [GUIDE-JP.md](GUIDE-JP.md) (instructions pas à pas)
+- **Email:** hello@imkyra.be
+- **Discord:** @freecey
 
-### Design Patterns
-
-- **Single Responsibility** - 1 classe = 1 job
-- **Dependency Injection** - Physics, Timer, Audio
-- **Strategy Pattern** - Enemy AI types
-- **Observer Pattern** - Timers
-- **Separation of Concerns** - UI/Game/Systems
-
----
-
-## 🚀 Deployment
-
-### Local Test
-
-```bash
-cd projects/rush-platformer
-npx serve . -l 8081
-```
-→ http://localhost:8081
-
-### Production (ISPConfig)
-
-Voir [`DEPLOY-ISPCONFIG.md`](DEPLOY-ISPCONFIG.md)
-
-**Steps:**
-1. SSH à `cloud1.neant.be`
-2. Nginx config
-3. SSL Let's Encrypt
-4. Niveaux + Boss + Power-ups
-5. Test + deploy
-
-**URL:** `https://platformer.kyralab.be`
-
----
-
-## ⌬ Kyra Brand
-
-### Style
-
-- **Couleur:** Cyan #00bcd4
-- **Font:** JetBrains Mono (terminal aesthetic)
-- **Theme:** Dark mode
-- **Symbol:** ⌬
-
-### Philosophy
-
-```
-⌬ Signal net. Bruit réduit.
-```
-
-> _Sharp, direct, not corporate fluff._
-
-### Created By
-
-**Kyra ⌬** - Autonomous daemon system  
-**For:** JP's Challenge  
-**Date:** 2026-04-10
-
----
-
-## 🎯 Stats
-
-| Metric | Value |
-|--------|-------|
-| **Code Lines** | 2,500+ |
-| **Files** | 24 |
-| **Modules** | 12 ES6 classes |
-| **Level Count** | 5 progressive |
-| **Enemy Types** | 4 + Boss |
-| **Power-Ups** | 4 types |
-| **Deploy URL** | platformer.kyralab.be |
-| **License** | MIT |
-
----
-
-## 📈 Roadmap
-
-### Completed ✅
-
-- [x] v3.0 - Boss battle
-- [x] Power-up system
-- [x] 5 progressive levels
-- [x] 4 enemy types
-- [x] Kyra branding
-- [x] Architecture v2.0
-
-### TODO 🔮
-
-- [ ] v3.1 - Multiplayer local
-- [ ] Achievement system
-- [ ] Background music
-- [ ] Mobile touch controls
-- [ ] Gamepad support
-- [ ] Level editor
-
----
-
-## 🔥 Tech Stack
-
-- **Language:** ES6 JavaScript
-- **Graphics:** Canvas API
-- **Audio:** Web Audio API
-- **Build:** Native (no bundler)
-- **No Dependencies:** Pure JS
-
----
-
-## 📝 License
-
-**MIT License**
-
-Copyright © 2026 Kyra ⌬
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED...
-
----
-
-## 📞 Contact
-
-**Questions?**
-- Email: hello@imkyra.be
-- Discord: @freecey
-- GitHub: @Freecey/neon-protocol
-
-**Credit:**
-- Created for: JP
-- Powered by: Kyra ⌬
-- Date: 2026-04-10
+**Created By:**
+- **Author:** Kyra ⌬
+- **For:** JP's Challenge
+- **Date:** 2026-04-10
+- **License:** MIT
 
 ---
 
@@ -279,10 +154,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 **🎮 PLAY NOW**
 
-```bash
-cd projects/rush-platformer
-npx serve . -l 8081
-```
+**Windows:** Double-clique sur **`play.bat`**  
+**Linux/Mac:** `npx serve . -l 8081`
 
 **⌬ Kyra ⌬**  
 _Signal net. Bruit réduit._  
