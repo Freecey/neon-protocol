@@ -21,10 +21,18 @@ export default class Game {
       level: 1,
       timeLeft: 60,
       lastTime: 0,
+      maxLevel: 3,
       enemies: [],
       players: [],
       coins: [],
-      particles: []
+      particles: [],
+      powerups: [],
+      boss: null,
+      bossPhase: 1,
+      bossActive: false,
+      invincibility: 0, // invincibility frames
+      powerupActive: null,
+      powerupTime: 0
     };
     
     this.physics = new Physics();
@@ -43,10 +51,22 @@ export default class Game {
   
   reset() {
     this.player = new Player(100, 300);
+    this.levelManager.loadLevel(this.state.level);
     this.state.enemies = this.levelManager.enemies;
     this.state.coins = this.levelManager.coins;
     this.state.particles = [];
+    this.state.powerups = [];
+    this.state.boss = null;
+    this.state.bossActive = this.state.level === 3;
     this.player.health = 100;
+    this.state.invincibility = 0;
+    this.state.powerupActive = null;
+    this.state.powerupTime = 0;
+    
+    // Boss level setup
+    if (this.state.bossActive) {
+      this.state.boss = this.levelManager.generateBoss();
+    }
   }
   
   resize() {

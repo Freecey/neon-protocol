@@ -11,26 +11,28 @@
       box-sizing: border-box;
     }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Segoe UI', 'JetBrains Mono', Monaco, monospace;
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 50%, #16213e 100%);
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
+      color: #e0e0e0;
     }
     #game-container {
       position: relative;
       width: 90vw;
       height: 85vh;
       max-width: 1200px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      background: #0a0a14;
+      border: 2px solid #00bcd4;
+      border-radius: 12px;
+      box-shadow: 0 0 40px rgba(0, 188, 212, 0.2), 0 20px 60px rgba(0, 0, 0, 0.5);
       overflow: hidden;
     }
     #game-canvas {
-      background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 100%);
+      background: linear-gradient(to bottom, #0d1b2a 0%, #1b263b 100%);
       display: block;
     }
     #ui-layer {
@@ -48,50 +50,79 @@
       position: absolute;
       top: 20px;
       left: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
+      background: rgba(0, 188, 212, 0.85);
+      color: #0a0a14;
       padding: 12px 20px;
       border-radius: 8px;
       font-size: 18px;
       font-weight: bold;
+      border: 1px solid #00bcd4;
+      font-family: 'JetBrains Mono', monospace;
     }
     #timer {
       position: absolute;
       top: 20px;
       right: 20px;
-      background: rgba(255, 69, 0, 0.9);
+      background: rgba(255, 69, 0, 0.95);
       color: white;
       padding: 12px 20px;
       border-radius: 8px;
       font-size: 24px;
       font-weight: bold;
       font-family: monospace;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 69, 0, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(255, 69, 0, 0.8); }
     }
     #level-info {
       position: absolute;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(76, 175, 80, 0.9);
-      color: white;
+      background: rgba(0, 188, 212, 0.85);
+      color: #0a0a14;
       padding: 12px 30px;
       border-radius: 8px;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
+      border: 1px solid #00bcd4;
+    }
+    #kyra-badge {
+      position: absolute;
+      top: 10px;
+      left: 30px;
+      font-size: 14px;
+      color: #00bcd4;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
     }
     #controls-hint {
       position: absolute;
       bottom: 20px;
       left: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
+      background: rgba(0, 188, 212, 0.85);
+      color: #0a0a14;
       padding: 12px 20px;
       border-radius: 8px;
       font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      border: 1px solid #00bcd4;
     }
     .controls-hint {
       margin: 5px 0;
-      color: #FFD700;
+      color: #000;
+      font-weight: bold;
+    }
+    #kyra-footer {
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+      font-size: 11px;
+      color: rgba(0, 188, 212, 0.6);
+      font-family: 'JetBrains Mono', monospace;
     }
     #start-screen, #game-over-screen {
       position: absolute;
@@ -99,7 +130,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(10, 10, 20, 0.95);
+      backdrop-filter: blur(10px);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -111,8 +143,20 @@
     h1 {
       font-size: 48px;
       margin-bottom: 20px;
-      color: #FFD700;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      color: #00bcd4;
+      text-shadow: 0 0 20px rgba(0, 188, 212, 0.5);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    h1::before {
+      content: "⌬ ";
+      color: #00bcd4;
+    }
+    #game-over-title {
+      font-size: 42px;
+      margin-bottom: 15px;
+    }
+    #game-over-title::before {
+      content: "⌬ ";
     }
     p {
       font-size: 18px;
@@ -120,21 +164,34 @@
       max-width: 600px;
       text-align: center;
       line-height: 1.6;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tagline {
+      font-size: 14px;
+      color: rgba(0, 188, 212, 0.7);
+      margin-top: 20px;
+      font-family: 'JetBrains Mono', monospace;
     }
     button {
-      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-      color: white;
-      border: none;
+      background: linear-gradient(135deg, #00bcd4 0%, #0083aa 100%);
+      color: #0a0a14;
+      border: 2px solid #00bcd4;
       padding: 15px 40px;
       font-size: 20px;
       border-radius: 8px;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
       font-weight: bold;
+      font-family: 'JetBrains Mono', monospace;
+      text-shadow: none;
     }
     button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+      box-shadow: 0 5px 20px rgba(0, 188, 212, 0.6);
+      background: linear-gradient(135deg, #00e5ff 0%, #00bcd4 100%);
+    }
+    button:active {
+      transform: translateY(0);
     }
     .hidden {
       display: none !important;
@@ -145,13 +202,14 @@
       left: 20px;
       width: 200px;
       height: 20px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 188, 212, 0.85);
       border-radius: 10px;
       overflow: hidden;
+      border: 1px solid #00bcd4;
     }
     #health-fill {
       height: 100%;
-      background: linear-gradient(90deg, #FF6B6B 0%, #4CAF50 100%);
+      background: linear-gradient(90deg, #00bcd4 0%, #0083aa 100%);
       width: 100%;
       transition: width 0.3s ease;
     }
@@ -161,6 +219,7 @@
   <div id="game-container">
     <canvas id="game-canvas"></canvas>
     
+    <div id="kyra-badge">⌬ <strong>Kyra Platformer</strong></div>
     <div id="ui-layer">
       <div id="score-board" class="ui-element hidden">
         Score: <span id="score">0</span>
@@ -183,6 +242,7 @@
       <div id="health-bar" class="ui-element hidden">
         <div id="health-fill"></div>
       </div>
+      <div id="kyra-footer">⌬ Kyra ⌬</div>
     </div>
     
     <div id="start-screen">
@@ -190,12 +250,14 @@
       <p>Aide JP à traverser ce niveau de plateforme en temps record ! Évite les ennemis et collecte les points.</p>
       <p><strong>Objectif :</strong> Survivre 60 seconds et récolter un maximum de points !</p>
       <button onclick="startGame()">Commencer</button>
+      <p class="tagline">Powered by Kyra ⌬ • Signal net. Bruit réduit.</p>
     </div>
     
     <div id="game-over-screen" class="hidden">
       <h1 id="game-over-title">Game Over</h1>
       <p id="game-over-message">Score final : 0</p>
       <button onclick="restartGame()">Rejouer</button>
+      <p class="tagline">Powered by Kyra ⌬ • Signal net. Bruit réduit.</p>
     </div>
   </div>
 
