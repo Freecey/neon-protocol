@@ -1,0 +1,19 @@
+{
+  "name": "rush-platformer",
+  "version": "2.0.0",
+  "description": "Rush Platformer - Professional Architecture for JP",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve . -l 8081",
+    "build": "esbuild src/main.js --bundle --outfile=public/bundle.js",
+    "test": "echo \"Tests not implemented yet\""
+  },
+  "keywords": ["game", "platformer", "javascript", "es6"],
+  "author": "JP's Challenge",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
