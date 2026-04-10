@@ -15,38 +15,34 @@
 
 ---
 
-## 🚀 Quick Start
+## 🚀 **POUR JP (WINDOWS)**
 
-### 🪟 **Windows (JP - NO NPM INSTALLATION)**
+**🔴 MÉTHODE PRÉFÉRÉE: EXÉCUTABLE**
 
-**TL;DR:** Double-clique sur **`play.bat`**! 👇
+1. **Reçois** le fichier `.exe` (depuis USB ou email)
+2. **Double-clique** → Installation
+3. **JOUE!** 🎮 (Pas de npm, pas de node!)
 
-1. **Télécharge** le repo: https://github.com/Freecey/neon-protocol
-2. **Dézippe** dans un dossier (`C:\Games\neon-protocol`)
-3. **Double-clique** sur **`play.bat`**
-4. **Le navigateur s'ouvre** → http://localhost:8081
-5. **Clique** sur **"Commencer"**
-6. **JOUE !** 🎮
+**Si tu n'as pas encore le .exe:**
 
-**Besoin d'installer quelque chose?**
-- Si `play.bat` ne marche pas → Installe Node.js (voir [GUIDE-JP.md](GUIDE-JP.md))
-- Sinon → **JOUEZ!** C'est tout!
+**Méthode 1 - Play.bat (sans installer):**
+1. Télécharge le ZIP: https://github.com/Freecey/neon-protocol
+2. Dézippe dans `C:\Games\neon-protocol`
+3. Double-clique sur `play.bat`
+4. Le jeu s'ouvre!
 
-### 🐧 **Linux/Mac (avec npx)**
-
-```bash
-cd projects/rush-platformer
-npx serve . -l 8081
-```
-→ **http://localhost:8081**
+**Méthode 2 - Installer Node.js (si play.bat ne marche pas):**
+1. https://nodejs.org/
+2. Clique sur "LTS Version" (vert)
+3. Installe
+4. Relance `play.bat`
 
 ---
 
-## 📖 Documentation
-
-- 📘 **[GUIDE-JP.md](GUIDE-JP.md)** - Guide complet pour JP (Windows, sans connaissances)
-- 🔧 **[DEPLOY-ISPCONFIG.md](DEPLOY-ISPCONFIG.md)** - Déploiement production (ISPConfig)
-- 🏗️ **[ARCHITECTURE.md](ARCHITECTURE.md)** - Architecture technique
+## 📞 Support JP
+- **Guide complet:** [GUIDE-JP.md](GUIDE-JP.md)
+- **Email:** hello@imkyra.be
+- **Discord:** @freecey
 
 ---
 
@@ -135,18 +131,134 @@ npx serve . -l 8081
 
 ---
 
+## 🏗️ Architecture
+
+```
+neon-protocol/
+├── src/
+│   ├── main.js              # Entry point
+│   ├── Game.js              # Core loop
+│   ├── entities/
+│   │   ├── Player.js        # Stats + controls
+│   │   ├── Enemy.js         # AI behaviors
+│   │   ├── Boss.js          # Boss fight logic
+│   │   ├── Coin.js          # Collectible
+│   │   ├── PowerUp.js       # Bonus system
+│   │   └── Particle.js      # VFX
+│   ├── systems/
+│   │   ├── Physics.js       # Collision detection
+│   │   ├── Timer.js         # Countdown
+│   │   ├── Input.js         # Keyboard handler
+│   │   └── AudioSystem.js   # Web Audio API
+│   ├── ui/
+│   │   └── UIManager.js     # UI management
+│   └── levels/
+│       └── LevelManager.js  # Gen logic
+├── dist/                    # 🎮 EXÉCUTABLES
+│   ├── NEON PROTOCOL Setup 3.0.0.exe
+│   └── ...
+├── index.html               # Kyra branded UI
+├── package.json
+├── DEPLOY-ISPCONFIG.md     # ISPConfig guide
+├── ARCHITECTURE.md         # Tech docs
+└── README.md               # This file
+```
+
+### Design Patterns
+
+- **Single Responsibility** - 1 classe = 1 job
+- **Dependency Injection** - Physics, Timer, Audio
+- **Strategy Pattern** - Enemy AI types
+- **Observer Pattern** - Timers
+- **Separation of Concerns** - UI/Game/Systems
+
+---
+
+## 🚀 Deployment & Build
+
+### **Pour JP (Windows):**
+
+**Option 1 - EXE (Recommandé):**
+- Voir: [BUILD-WINDOWS.md](BUILD-WINDOWS.md)
+- Fichier `.exe` → Double-clique → JOUEZ!
+
+**Option 2 - Play.bat (Sans installer):**
+1. Télécharge ZIP: https://github.com/Freecey/neon-protocol
+2. Dézippe → `play.bat`
+3. Double-clique
+
+### **Pour développeurs:**
+
+```bash
+npm install
+npm run start
+```
+→ http://localhost:8081
+
+### **Build EXE:**
+```bash
+npm run build:win
+```
+→ `dist/NEON PROTOCOL Setup 3.0.0.exe`
+
+### **Production (ISPConfig)**
+Voir [`DEPLOY-ISPCONFIG.md`](DEPLOY-ISPCONFIG.md)
+
+---
+
+## ⌬ Kyra Brand
+
+### Style
+
+- **Couleur:** Cyan #00bcd4
+- **Font:** JetBrains Mono (terminal aesthetic)
+- **Theme:** Dark mode
+- **Symbol:** ⌬
+
+### Philosophy
+
+```
+⌬ Signal net. Bruit réduit.
+```
+
+> _Sharp, direct, not corporate fluff._
+
+### Created By
+
+**Kyra ⌬** - Autonomous daemon system  
+**For:** JP's Challenge  
+**Date:** 2026-04-10
+
+---
+
+## 📈 Stats
+
+| Metric | Value |
+|--------|-------|
+| **Code Lines** | 2,500+ |
+| **Files** | 28 |
+| **Modules** | 12 ES6 classes |
+| **Levels** | 5 progressive |
+| **Enemy Types** | 4 + Boss |
+| **Power-Ups** | 4 types |
+| **Windows EXE** | 100MB |
+| **Deploy URL** | platformer.kyralab.be |
+| **License** | MIT |
+
+---
+
 ## 📞 Support & Credits
 
 **Pour JP:**
-- **Aide:** [GUIDE-JP.md](GUIDE-JP.md) (instructions pas à pas)
-- **Email:** hello@imkyra.be
-- **Discord:** @freecey
+- 📄 [GUIDE-JP.md](GUIDE-JP.md) - Instructions pas à pas
+- 🎮 [BUILD-WINDOWS.md](BUILD-WINDOWS.md) - Créer .exe
+- 📧 Email: hello@imkyra.be
+- 💬 Discord: @freecey
 
-**Created By:**
-- **Author:** Kyra ⌬
-- **For:** JP's Challenge
-- **Date:** 2026-04-10
-- **License:** MIT
+**Technical:**
+- Electron v32.0.0
+- Node.js v20.x
+- No bundler (pure JS)
 
 ---
 
@@ -154,8 +266,9 @@ npx serve . -l 8081
 
 **🎮 PLAY NOW**
 
-**Windows:** Double-clique sur **`play.bat`**  
-**Linux/Mac:** `npx serve . -l 8081`
+**Windows Exe:** Reçois le `.exe` + Double-clique  
+**Windows Play:** `play.bat` + Double-clique  
+**Linux/Mac:** `npm run start`
 
 **⌬ Kyra ⌬**  
 _Signal net. Bruit réduit._  
@@ -165,4 +278,4 @@ https://imkyra.be
 
 ---
 
-*Fait pour JP • Archi v3.0 • 2026-04-10*
+*Faitpour JP • Archi v3.0 • 2026-04-10*
