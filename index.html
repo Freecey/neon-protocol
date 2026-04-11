@@ -262,5 +262,15 @@
   </div>
 
   <script src="public/game-bundle.js"></script>
+  <script>
+    // EXPOSE FUNCTIONS TO WINDOW AFTER BUNDLE LOADS
+    setTimeout(function() {
+      if (typeof startGame !== 'undefined') window.startGame = startGame;
+      if (typeof restartGame !== 'undefined') window.restartGame = restartGame;
+      if (typeof startNextLevel !== 'undefined') window.startNextLevel = startNextLevel;
+      if (typeof initLevel !== 'undefined') window.initLevel = initLevel;
+      console.log('NEON PROTOCOL: All functions exposed to window.');
+    }, 100);
+  </script>
 </body>
 </html>
