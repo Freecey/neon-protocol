@@ -30,16 +30,6 @@ class AudioSystem {
   }
   
   init() {
-    // Close any existing context first
-    if (this.ctx) {
-      try {
-        this.ctx.close();
-      } catch (e) {
-        // Ignore close errors
-      }
-      this.ctx = null;
-    }
-    
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AudioContext();
@@ -317,14 +307,6 @@ class AudioSystem {
         clearTimeout(this.currentMusic.timeout);
       }
       this.currentMusic = null;
-    }
-    if (this.ctx) {
-      try {
-        this.ctx.close();
-      } catch (e) {
-        // Ignore close errors
-      }
-      this.ctx = null;
     }
   }
   
