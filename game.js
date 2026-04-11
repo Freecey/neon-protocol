@@ -10,6 +10,18 @@ import PowerUpSystem from './src/systems/PowerUpSystem.js';
 import MenuSystem from './src/systems/ui/MenuSystem.js';
 import LevelManager from './src/levels/LevelManager.js';
 import Boss from './src/entities/Boss.js';
+// Mobile touch controls will be loaded dynamically
+let MobileTouchControls = null;
+
+// Load mobile controls if on mobile device
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+  import('./src/mobile/mobile-controls.js').then(mod => {
+    MobileTouchControls = mod.MobileTouchControls;
+    if (MobileTouchControls) {
+      new MobileTouchControls();
+    }
+  }).catch(() => console.log('Mobile controls not available'));
+}
 
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -596,4 +608,10 @@ function restartGame() {
 
 // Initialize
 resizeCanvas();
-// Don't start game yet - show menu first!
+initLevel();
+render();
+
+// Expose functions globally for HTML onclick handlers
+window.startGame = startGame;
+window.restartGame = restartGame;
+window.startNextLevel = startNextLevel;

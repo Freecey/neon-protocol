@@ -1,0 +1,23 @@
+{
+  "appId": "com.nean.kyra",
+  "appName": "NEON PROTOCOL",
+  "webDir": "./",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000
+    }
+  },
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  },
+  "ios": {
+    "contents": {
+      "dir": "ios/App"
+    }
+  }
+}
