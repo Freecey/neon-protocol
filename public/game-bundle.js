@@ -2530,3 +2530,5 @@
     console.log("NEON PROTOCOL v5.3 ready!");
   })();
 })();
+
+  if (typeof window !== 'undefined') { window.startGame = window.startGame || startGame; window.restartGame = window.restartGame || restartGame; window.startNextLevel = window.startNextLevel || startNextLevel; window.initLevel = window.initLevel || initLevel; console.log('NEON PROTOCOL: Functions exposed!'); console.log('NEON PROTOCOL v5.3 loaded!'); };
