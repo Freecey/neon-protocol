@@ -2136,6 +2136,17 @@
   __name(resizeCanvas, "resizeCanvas");
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
+  function initLevel() {
+    loadLevel(1);
+    render();
+    updateUI();
+    const message = document.createElement("div");
+    message.innerHTML = "<strong>\u{1F3AE} NEON PROTOCOL</strong><br>Aide JP!<br>Succ\xE8s : Survivre 60s";
+    message.style.cssText = "position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); color:#00bcd4; font-size:24px; font-family:JetBrains Mono; text-align:center; animation:fadeIn 1s;";
+    document.getElementById("game-canvas").parentElement.appendChild(message);
+    setTimeout(() => message.remove(), 3e3);
+  }
+  __name(initLevel, "initLevel");
   function loadLevel(levelNum) {
     gameState2.level = levelNum;
     gameState2.timeLeft = 60 + (levelNum - 1) * 10;
@@ -2529,6 +2540,13 @@
     }
     console.log("NEON PROTOCOL v5.3 ready!");
   })();
-})();
+})(
 
-  if (typeof window !== 'undefined') { window.startGame = window.startGame || startGame; window.restartGame = window.restartGame || restartGame; window.startNextLevel = window.startNextLevel || startNextLevel; window.initLevel = window.initLevel || initLevel; console.log('NEON PROTOCOL: Functions exposed!'); console.log('NEON PROTOCOL v5.3 loaded!'); };
+  if (typeof window !== 'undefined') {
+    window.startGame = window.startGame || startGame;
+    window.restartGame = window.restartGame || restartGame;
+    window.startNextLevel = window.startNextLevel || startNextLevel;
+    window.initLevel = window.initLevel || initLevel;
+  }
+  console.log('NEON PROTOCOL v5.3 - ALL FUNCTIONS EXPOSED!');
+});
