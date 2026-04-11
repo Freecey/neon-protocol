@@ -1,0 +1,2 @@
+# Empêcher Jekyll de traiter le site (nécessaire pour fichiers commençant par underscore)
+# Ce fichier doit être à la racine de la branche gh-pages
