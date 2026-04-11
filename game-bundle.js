@@ -3068,13 +3068,13 @@
   resizeCanvas();
   initLevel();
   render();
-  (function() {
-    if (typeof window !== "undefined") {
-      window.startGame = window.startGame || startGame;
-      window.restartGame = window.restartGame || restartGame;
-      window.startNextLevel = window.startNextLevel || startNextLevel;
-      window.initLevel = window.initLevel || initLevel;
-    }
-    console.log("NEON PROTOCOL v5.3 ready!");
-  })();
+  
+  // EXPOSE FUNCTIONS GLOBALLY BEFORE IIFE CLOSES
+  if (typeof window !== 'undefined') {
+    window.startGame = startGame;
+    window.restartGame = restartGame;
+    window.startNextLevel = startNextLevel;
+    window.initLevel = initLevel;
+    console.log('NEON PROTOCOL v5.4.3 - Functions exposed globally');
+  }
 })();
