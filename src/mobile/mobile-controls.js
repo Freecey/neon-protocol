@@ -92,7 +92,7 @@ class MobileTouchControls {
     const createButton = (id, action) => {
       const btn = document.createElement('div');
       btn.id = id;
-      btn.className = mobile-btn';
+      btn.className = 'mobile-btn';
       btn.innerHTML = action;
       btn.style.position = 'fixed';
       btn.style.pointerEvents = 'auto';

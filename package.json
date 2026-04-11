@@ -12,10 +12,16 @@
     "build:mac": "electron-builder --mac --x64",
     "build:linux": "electron-builder --linux --x64"
   },
-  "keywords": ["game", "platformer", "electron", "windows"],
+  "keywords": [
+    "game",
+    "platformer",
+    "electron",
+    "windows"
+  ],
   "devDependencies": {
     "electron": "^32.0.0",
-    "electron-builder": "^25.1.8"
+    "electron-builder": "^25.1.8",
+    "esbuild": "^0.28.0"
   },
   "build": {
     "appId": "com.kyra.neon-protocol",

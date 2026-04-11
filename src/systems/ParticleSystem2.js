@@ -48,7 +48,8 @@ export default class ParticleSystem2 {
     
     // Floating text "+10"
     this.particles.push({
-      x, y - 20,
+      x: x,
+      y: y - 20,
       vx: 0,
       vy: -1,
       size: 0,
@@ -105,7 +106,7 @@ export default class ParticleSystem2 {
     };
     
     this.particles.push({
-      x, y - 30,
+      x: x, y: y - 30,
       vx: 0,
       vy: -2,
       size: 0,
@@ -225,7 +226,7 @@ export default class ParticleSystem2 {
     
     // Level text
     this.particles.push({
-      x, y - 50,
+      x: x, y: y - 50,
       vx: 0,
       vy: -1,
       size: 0,

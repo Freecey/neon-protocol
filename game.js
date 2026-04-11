@@ -2,11 +2,11 @@
 // Menu + Progression + Transitions + Particules + Combo + Leaderboard + Achievements
 
 import TransitionSystem from './src/systems/TransitionSystem.js';
-import LeaderboardSystem from './src/systems/LeaderboardSystem.js';
-import AchievementSystem from './src/systems/AchievementSystem.js';
+import { LeaderboardSystem } from './src/systems/LeaderboardSystem.js';
+import { AchievementSystem } from './src/systems/AchievementSystem.js';
 import ParticleSystem2 from './src/systems/ParticleSystem2.js';
 import ComboSystem from './src/systems/ComboSystem.js';
-import PowerUpSystem from './src/systems/PowerUpSystem.js';
+import { PowerUpSystem } from './src/systems/PowerUpSystem.js';
 import MenuSystem from './src/systems/ui/MenuSystem.js';
 import LevelManager from './src/levels/LevelManager.js';
 import Boss from './src/entities/Boss.js';
