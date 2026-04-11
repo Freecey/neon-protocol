@@ -21,8 +21,11 @@ export default class LevelManager {
   
   loadLevel(levelNum) {
     this.level = levelNum;
-    this.screenHeight = document.getElementById('canvas')?.height || window.innerHeight;
-    this.screenWidth = document.getElementById('canvas')?.width || window.innerWidth;
+    // RESET BOSS STATE (critical)
+    this.boss = null;
+    this.bosses = [];
+    this.screenHeight = document.getElementById('game-canvas')?.height || window.innerHeight;
+    this.screenWidth = document.getElementById('game-canvas')?.width || window.innerWidth;
     
     // Niveau 6 et 7 - Classes spécialisées
     if (levelNum === 6) {
