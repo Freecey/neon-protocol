@@ -1,6 +1,6 @@
 {
   "name": "neon-protocol",
-  "version": "3.0.0",
+  "version": "5.1.0",
   "description": "NEON PROTOCOL ⌬ - Rush Platformer with Boss & Power-ups",
   "main": "src/electron/main.js",
   "author": "Kyra ⌬",

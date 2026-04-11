@@ -1,11 +1,31 @@
-// RUSH PLATFORMER - Game Logic
-// Created for JP's Challenge
+// 🎮 NEON PROTOCOL v5.2 - INTÉGRATION COMPLÈTE
+// Menu + Progression + Transitions + Particules + Combo + Leaderboard + Achievements
+
+import TransitionSystem from './src/systems/TransitionSystem.js';
+import LeaderboardSystem from './src/systems/LeaderboardSystem.js';
+import AchievementSystem from './src/systems/AchievementSystem.js';
+import ParticleSystem2 from './src/systems/ParticleSystem2.js';
+import ComboSystem from './src/systems/ComboSystem.js';
+import PowerUpSystem from './src/systems/PowerUpSystem.js';
+import MenuSystem from './src/systems/ui/MenuSystem.js';
+import LevelManager from './src/levels/LevelManager.js';
+import Boss from './src/entities/Boss.js';
 
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 
-// Game state
-let gameState = {
+// INITIALISER TOUS LES SYSTÈMES
+const transitions = new TransitionSystem();
+const leaderboard = new LeaderboardSystem();
+const achievements = new AchievementSystem(leaderboard);
+const particles = new ParticleSystem2();
+const combo = new ComboSystem();
+const powerUps = new PowerUpSystem();
+const menu = new MenuSystem();
+const levelManager = new LevelManager();
+
+// STATE DU JEU
+const gameState = {
   running: false,
   score: 0,
   level: 1,
@@ -14,10 +34,12 @@ let gameState = {
   enemies: [],
   platforms: [],
   coins: [],
+  powerUpsList: [],
+  bosses: [],
   particles: []
 };
 
-// Player
+// PLAYER
 const player = {
   x: 100,
   y: 300,
@@ -29,123 +51,81 @@ const player = {
   jumpForce: -15,
   gravity: 0.6,
   grounded: false,
-  health: 100
+  health: 100,
+  doubleJumpEnabled: false,
+  jumpCount: 0,
+  shielded: false,
+  shieldDuration: 0,
+  speedBoost: false,
+  speedBoostDuration: 0,
+  invisible: false,
+  invisibleDuration: 0
 };
 
-// Input handling
+// INPUT
 const keys = {};
 document.addEventListener('keydown', (e) => {
   keys[e.code] = true;
-  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+  if (keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight'] || keys['Space']) {
     e.preventDefault();
+  }
+  // Keyboard shortcuts
+  if (e.code === 'Escape') {
+    // Quit/Menu logic
   }
 });
 document.addEventListener('keyup', (e) => keys[e.code] = false);
 
-// Canvas sizing
+// CANVAS SIZE
 function resizeCanvas() {
   canvas.width = canvas.parentElement.clientWidth;
   canvas.height = canvas.parentElement.clientHeight;
-  initLevel();
 }
 window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
-// Level initialization
-function initLevel() {
-  gameState.platforms = [];
-  gameState.enemies = [];
-  gameState.coins = [];
-  gameState.particles = [];
-  player.health = 100;
+// LEVEL INITIALIZATION
+function loadLevel(levelNum) {
+  gameState.level = levelNum;
+  gameState.timeLeft = 60 + (levelNum - 1) * 10;
+  gameState.running = true;
+  gameState.lastTime = performance.now();
+  gameState.score = 0;
+  
+  // Reset player
   player.x = 100;
   player.y = 300;
+  player.health = 100;
   player.vx = 0;
   player.vy = 0;
-
-  // Ground platform
-  gameState.platforms.push({
-    x: 0,
-    y: canvas.height - 60,
-    width: canvas.width,
-    height: 60,
-    type: 'ground'
-  });
-
-  // Generate platforms
-  platformGenerator(canvas.width, canvas.height - 60);
+  player.grounded = false;
+  player.speedBoost = false;
+  player.invisible = false;
   
-  // Generate enemies
-  enemyGenerator();
+  // Use LevelManager
+  levelManager.loadLevel(levelNum);
+  gameState.platforms = levelManager.platforms;
+  gameState.enemies = levelManager.enemies;
+  gameState.coins = levelManager.coins;
+  gameState.powerUpsList = levelManager.powerups;
+  gameState.bosses = levelManager.getBosses();
   
-  // Generate coins
-  coinGenerator();
-}
-
-function platformGenerator(screenWidth, groundY) {
-  // Create random platforms
-  for (let i = 0; i < 15; i++) {
-    const x = 150 + Math.random() * (screenWidth - 400);
-    const y = 150 + Math.random() * (groundY - 250);
-    const width = 80 + Math.random() * 120;
-    
-    // Don't place too close to other platforms
-    let tooClose = false;
-    for (const plat of gameState.platforms) {
-      const distX = Math.abs(x - plat.x);
-      const distY = Math.abs(y - plat.y);
-      if (distX < 100 && distY < 50) tooClose = true;
-    }
-    
-    if (!tooClose) {
-      gameState.platforms.push({
-        x: x,
-        y: y,
-        width: width,
-        height: 20,
-        type: 'platform'
-      });
-    }
+  // Update UI
+  updateScore();
+  document.getElementById('level').textContent = gameState.level;
+  document.getElementById('score-board').classList.remove('hidden');
+  document.getElementById('level-info').classList.remove('hidden');
+  document.getElementById('timer').classList.remove('hidden');
+  document.getElementById('controls-hint').classList.remove('hidden');
+  document.getElementById('health-bar').classList.remove('hidden');
+  
+  // Start transition
+  if (gameState.level > 1) {
+    transitions.startTransition('levelUp', `NIVEAU ${gameState.level} COMMENCÉ!`);
   }
 }
 
-function enemyGenerator() {
-  const enemyTypes = ['walker', 'flyer', 'bobber'];
-  
-  for (let i = 0; i < 5 + gameState.level; i++) {
-    const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-    const plat = gameState.platforms[Math.floor(Math.random() * gameState.platforms.length)];
-    
-    gameState.enemies.push({
-      x: plat.x + plat.width / 2 - 20,
-      y: plat.y - 40,
-      width: 40,
-      height: 40,
-      type: type,
-      vx: type === 'walker' ? (Math.random() > 0.5 ? 2 : -2) : 0,
-      vy: type === 'flyer' ? (Math.random() > 0.5 ? 1 : -1) : 0,
-      vyBob: type === 'bobber' ? -2 : 0,
-      bobSpeed: 0.03 + Math.random() * 0.02,
-      baseY: plat.y - 40,
-      patrolRange: 100,
-      direction: Math.random() > 0.5 ? 1 : -1,
-      lastChange: Date.now()
-    });
-  }
-}
-
-function coinGenerator() {
-  for (let i = 0; i < 20; i++) {
-    const plat = gameState.platforms[Math.floor(Math.random() * gameState.platforms.length)];
-    gameState.coins.push({
-      x: plat.x + plat.width / 2,
-      y: plat.y - 60 - Math.random() * 80,
-      size: 15,
-      collected: false
-    });
-  }
-}
-
-// Game loop
+// GAME LOOP
 function gameLoop(timestamp) {
   if (!gameState.running) return;
   
@@ -155,20 +135,33 @@ function gameLoop(timestamp) {
   update(deltaTime);
   render();
   
-  gameState.lastTime = timestamp;
   requestAnimationFrame(gameLoop);
 }
 
+// UPDATE
 function update(deltaTime) {
   // Player movement
-  if (keys['ArrowLeft'] || keys['KeyA']) player.vx = -player.speed;
-  else if (keys['ArrowRight'] || keys['KeyD']) player.vx = player.speed;
+  let currentSpeed = player.speed;
+  if (player.speedBoost) currentSpeed *= 2;
+  
+  if (keys['ArrowLeft'] || keys['KeyA']) player.vx = -currentSpeed;
+  else if (keys['ArrowRight'] || keys['KeyD']) player.vx = currentSpeed;
   else player.vx = 0;
   
   // Jump
   if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW']) && player.grounded) {
     player.vy = player.jumpForce;
     player.grounded = false;
+    player.jumpCount = 1;
+    particles.jumpTrail(player.x + player.width/2, player.y + player.height);
+    achievements.updateStats('jumps');
+  }
+  
+  // Double jump
+  if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW']) && player.jumpCount === 1 && player.doubleJumpEnabled) {
+    player.vy = player.jumpForce;
+    player.jumpCount = 2;
+    particles.burst(player.x + player.width/2, player.y + player.height, 8, '#4CAF50');
   }
   
   // Fast fall
@@ -176,7 +169,7 @@ function update(deltaTime) {
     player.vy += player.gravity * 2;
   }
   
-  // Apply gravity
+  // Gravity
   player.vy += player.gravity;
   
   // Update player position
@@ -187,7 +180,7 @@ function update(deltaTime) {
   if (player.x < 0) player.x = 0;
   if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
   
-  // Ground platform collision
+  // Ground collision
   player.grounded = false;
   for (const plat of gameState.platforms) {
     if (player.y + player.height >= plat.y &&
@@ -198,6 +191,7 @@ function update(deltaTime) {
       player.y = plat.y - player.height;
       player.vy = 0;
       player.grounded = true;
+      player.jumpCount = 0;
     }
   }
   
@@ -213,6 +207,7 @@ function update(deltaTime) {
           player.y = plat.y - player.height;
           player.vy = 0;
           player.grounded = true;
+          player.jumpCount = 0;
         }
       }
     }
@@ -223,156 +218,207 @@ function update(deltaTime) {
     player.health -= 25;
     player.y = 100;
     player.vy = 0;
-    createParticles(player.x + player.width/2, player.y + player.height, 'red', 10);
+    particles.hurtEffect(player.x + player.width/2, player.y);
   }
   
   // Update enemies
-  updateEnemies(deltaTime);
+  updateEnemies();
   
-  // Coin collection
+  // Update coins
   updateCoins();
   
+  // Update power-ups
+  updatePowerUps();
+  
   // Update timer
-  updateTimer();
+  gameState.timeLeft -= deltaTime / 1000;
+  if (gameState.timeLeft < 0) gameState.timeLeft = 0;
+  
+  // Update timer UI
+  const minutes = Math.floor(gameState.timeLeft / 60);
+  const seconds = Math.floor(gameState.timeLeft % 60);
+  document.getElementById('timer').textContent = 
+    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   
   // Update health bar
-  updateHealthBar();
+  const healthFill = document.getElementById('health-fill');
+  if (healthFill) healthFill.style.width = Math.max(0, player.health) + '%';
   
   // Update particles
-  updateParticles();
+  particles.update(deltaTime);
+  
+  // Update transitions
+  transitions.update(deltaTime);
+  
+  // Update combos
+  combo.update(deltaTime);
   
   // Check game over
   if (player.health <= 0) {
     gameOver(false);
-  } else if (gameState.timeLeft <= 0) {
+  } else if (gameState.timeLeft <= 0 && gameState.bosses.length === 0) {
+    // Time up
     gameOver(true);
+  }
+  
+  // Update power-up durations
+  if (player.shielded && player.shieldDuration > 0) {
+    player.shieldDuration--;
+    if (player.shieldDuration <= 0) {
+      player.shielded = false;
+    }
+  }
+  
+  if (player.speedBoost && player.speedBoostDuration > 0) {
+    player.speedBoostDuration--;
+    if (player.speedBoostDuration <= 0) {
+      player.speedBoost = false;
+    }
+  }
+  
+  if (player.invisible && player.invisibleDuration > 0) {
+    player.invisibleDuration--;
+    if (player.invisibleDuration <= 0) {
+      player.invisible = false;
+    }
   }
 }
 
-function updateEnemies(deltaTime) {
-  for (const enemy of gameState.enemies) {
-    const now = Date.now();
+// UPDATE ENEMIES
+function updateEnemies() {
+  // Check if all enemies defeated
+  if (gameState.enemies.length === 0 && gameState.bosses.length === 0 && gameState.timeLeft <= 0) {
+    gameOver(true);
+    return;
+  }
+  
+  for (let i = gameState.enemies.length - 1; i >= 0; i--) {
+    const enemy = gameState.enemies[i];
     
     switch (enemy.type) {
       case 'walker':
         enemy.x += enemy.vx;
-        // Patrol
-        if (enemy.x < enemy.startX - enemy.patrolRange || 
-            enemy.x > enemy.startX + enemy.patrolRange ||
-            now - enemy.lastChange > 2000) {
+        if (Math.abs(enemy.x - enemy.startX) > enemy.patrolRange) {
           enemy.vx *= -1;
-          enemy.direction *= -1;
-          enemy.lastChange = now;
         }
         break;
         
       case 'flyer':
         enemy.x += enemy.vx;
         enemy.y += enemy.vy;
-        // Bounce off walls
         if (enemy.x < 50 || enemy.x > canvas.width - 50) {
           enemy.vx *= -1;
         }
-        // Bounce vertically
         if (enemy.y < 100 || enemy.y > canvas.height - 100) {
           enemy.vy *= -1;
         }
         break;
         
       case 'bobber':
-        enemy.y = enemy.baseY + Math.sin(now * enemy.bobSpeed) * 30;
-        enemy.x += Math.sin(now * 0.002) * 1;
+        const time = Date.now();
+        enemy.y = enemy.baseY + Math.sin(time * enemy.bobSpeed) * 30;
+        enemy.x += Math.sin(time * 0.002) * 1;
         break;
     }
     
     // Collision with player
-    if (checkCollision(player, enemy)) {
-      player.health -= 10;
-      player.vy = -8;
-      player.vx = (player.x < enemy.x) ? -5 : 5;
-      createParticles(player.x + player.width/2, player.y + player.height/2, 'orange', 8);
+    if (!player.invisible && checkCollision(player, enemy)) {
+      if (player.shielded) {
+        player.shielded = false;
+        player.shieldDuration = 0;
+        player.health = 100;
+        particles.burst(player.x + player.width/2, player.y + player.height/2, 10, '#2196F3');
+      } else if (checkCollision(player, {x: enemy.x, y: enemy.y, width: enemy.width - 20, height: enemy.height - 20})) {
+        player.health -= 10;
+        player.vy = -8;
+        player.vx = (player.x < enemy.x) ? -5 : 5;
+        particles.hurtEffect(player.x + player.width/2, player.y + player.height/2);
+      }
     }
   }
 }
 
+// UPDATE COINS
 function updateCoins() {
-  for (const coin of gameState.coins) {
+  for (let i = gameState.coins.length - 1; i >= 0; i--) {
+    const coin = gameState.coins[i];
     if (coin.collected) continue;
     
-    // Check collection
     const dx = (player.x + player.width/2) - coin.x;
     const dy = (player.y + player.height/2) - coin.y;
     const dist = Math.sqrt(dx*dx + dy*dy);
     
     if (dist < player.width/2 + coin.size) {
       coin.collected = true;
-      gameState.score += 10 * gameState.level;
+      const value = coin.value || 10;
+      const scored = combo.coinCollected(value);
+      gameState.score += scored;
+      achievements.updateStats('coinsCollected');
+      leaderboard.data.levels[gameState.level].coinsCollected = 
+        (leaderboard.data.levels[gameState.level].coinsCollected || 0) + 1;
+      
+      // Effect
+      particles.collectCoin(coin.x, coin.y);
       updateScore();
-      createParticles(coin.x, coin.y, 'gold', 5);
     }
   }
 }
 
-function updateTimer() {
-  gameState.timeLeft -= 0.016; // ~60fps
-  if (gameState.timeLeft < 0) gameState.timeLeft = 0;
-  
-  const minutes = Math.floor(gameState.timeLeft / 60);
-  const seconds = Math.floor(gameState.timeLeft % 60);
-  document.getElementById('timer').textContent = 
-    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
-
-function updateScore() {
-  document.getElementById('score').textContent = gameState.score;
-}
-
-function updateHealthBar() {
-  const healthFill = document.getElementById('health-fill');
-  healthFill.style.width = Math.max(0, player.health) + '%';
-}
-
-function createParticles(x, y, color, count) {
-  for (let i = 0; i < count; i++) {
-    gameState.particles.push({
-      x: x,
-      y: y,
-      vx: (Math.random() - 0.5) * 6,
-      vy: (Math.random() - 0.5) * 6,
-      life: 1,
-      color: color,
-      size: 3 + Math.random() * 4
-    });
-  }
-}
-
-function updateParticles() {
-  for (let i = gameState.particles.length - 1; i >= 0; i--) {
-    const p = gameState.particles[i];
-    p.x += p.vx;
-    p.y += p.vy;
-    p.life -= 0.03;
-    if (p.life <= 0) {
-      gameState.particles.splice(i, 1);
+// UPDATE POWER-UPS
+function updatePowerUps() {
+  for (let i = gameState.powerUpsList.length - 1; i >= 0; i--) {
+    const pu = gameState.powerUpsList[i];
+    if (pu.collected) continue;
+    
+    const dx = (player.x + player.width/2) - pu.x;
+    const dy = (player.y + player.height/2) - pu.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    
+    if (dist < player.width/2 + 20) {
+      pu.collected = true;
+      powerUps.activate(pu.type, player);
+      achievements.updateStats('powerUpsUsed');
+      particles.collectPowerUp(pu.x, pu.y, pu.type);
+      
+      // Apply effects
+      switch (pu.type) {
+        case 'doubleJump':
+          player.doubleJumpEnabled = true;
+          break;
+        case 'shield':
+          player.shielded = true;
+          player.shieldDuration = 30 * 60; // 30s
+          break;
+        case 'speed':
+          player.speedBoost = true;
+          player.speedBoostDuration = 20 * 60; // 20s
+          break;
+        case 'freeze':
+          // Freeze enemies logic (simplified)
+          gameState.enemies.forEach(e => e.speed *= 0.5);
+          break;
+        case 'timeStop':
+          achievements.updateStats('timeStopsUsed');
+          break;
+        case 'magnet':
+          achievements.updateStats('magnetsUsed');
+          break;
+        case 'invisibility':
+          player.invisible = true;
+          player.invisibleDuration = 15 * 60; // 15s
+          break;
+      }
     }
   }
 }
 
+// RENDER
 function render() {
   // Clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   // Draw platforms
-  ctx.fillStyle = '#666';
-  for (const plat of gameState.platforms) {
-    ctx.fillStyle = plat.type === 'ground' ? '#4CAF50' : '#757575';
-    ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
-    
-    // Platform detail
-    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(plat.x, plat.y, plat.width, plat.height);
-  }
+  levelManager.render(ctx);
   
   // Draw coins
   for (const coin of gameState.coins) {
@@ -405,8 +451,23 @@ function render() {
     ctx.fill();
   }
   
+  // Draw bosses
+  for (const boss of gameState.bosses) {
+    // Boss body
+    ctx.fillStyle = '#E91E63';
+    ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
+    
+    // Boss health bar
+    const healthPercent = boss.health / boss.maxHealth;
+    ctx.fillStyle = '#333';
+    ctx.fillRect(boss.x, boss.y - 12, boss.width, 8);
+    ctx.fillStyle = healthPercent > 0.5 ? '#4CAF50' : healthPercent > 0.25 ? '#FFC107' : '#F44336';
+    ctx.fillRect(boss.x, boss.y - 12, boss.width * healthPercent, 8);
+  }
+  
   // Draw player
-  ctx.fillStyle = '#4CAF50';
+  ctx.globalAlpha = player.invisible ? 0.3 : 1;
+  ctx.fillStyle = player.shielded ? '#2196F3' : '#4CAF50';
   ctx.fillRect(player.x, player.y, player.width, player.height);
   
   // Player face
@@ -420,16 +481,24 @@ function render() {
   ctx.arc(player.x + 10, player.y + 15, 2, 0, Math.PI * 2);
   ctx.arc(player.x + 30, player.y + 15, 2, 0, Math.PI * 2);
   ctx.fill();
+  ctx.globalAlpha = 1;
   
   // Draw particles
-  for (const p of gameState.particles) {
-    ctx.globalAlpha = p.life;
-    ctx.fillStyle = p.color;
-    ctx.fillRect(p.x, p.y, p.size, p.size);
-    ctx.globalAlpha = 1;
+  particles.render(ctx);
+  
+  // Draw transitions
+  transitions.render(ctx);
+  
+  // Draw combo display
+  if (combo.isComboActive()) {
+    ctx.fillStyle = '#FFF';
+    ctx.font = 'bold 24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(combo.getComboText(), canvas.width - 100, 50);
   }
 }
 
+// HELPER FUNCTIONS
 function getEnemyColor(type) {
   switch (type) {
     case 'walker': return '#FF6B6B';
@@ -446,114 +515,85 @@ function checkCollision(obj1, obj2) {
          obj1.y + obj1.height > obj2.y;
 }
 
-// Game control functions
+function updateScore() {
+  document.getElementById('score').textContent = gameState.score;
+  leaderboard.data.global.highest = Math.max(leaderboard.data.global.highest, gameState.score);
+  leaderboard.save();
+}
+
+// GAME CONTROL
 function startGame() {
   if (document.getElementById('level-transition')) document.getElementById('level-transition').remove();
   
   document.getElementById('start-screen').classList.add('hidden');
   document.getElementById('game-over-screen').classList.add('hidden');
-  document.getElementById('score-board').classList.remove('hidden');
-  document.getElementById('level-info').classList.remove('hidden');
-  document.getElementById('timer').classList.remove('hidden');
-  document.getElementById('controls-hint').classList.remove('hidden');
-  document.getElementById('health-bar').classList.remove('hidden');
+  document.getElementById('menu-overlay')?.classList.add('hidden');
   
-  gameState.running = true;
-  gameState.score = 0;
-  gameState.timeLeft = 60 + (gameState.level - 1) * 10;
-  gameState.lastTime = performance.now();
-  
-  updateScore();
-  setTimeout(() => document.getElementById('level').textContent = gameState.level, 100);
-  
+  loadLevel(1);
   requestAnimationFrame(gameLoop);
 }
 
 function gameOver(won) {
   gameState.running = false;
   
-  // Si le joueur a survécu et qu'on peut passer au niveau suivant
+  // Save score
+  leaderboard.submitScore(gameState.level, gameState.score);
+  
+  // Check achievements
+  achievements.updateStats('timeSurvived', Math.floor(gameState.timeLeft));
+  
+  // If won and level < 5
   if (won && gameState.level < 5) {
-    const transitionMsg = document.createElement('div');
-    transitionMsg.id = 'level-transition';
-    transitionMsg.style.position = 'fixed';
-    transitionMsg.style.top = '50%';
-    transitionMsg.style.left = '50%';
-    transitionMsg.style.transform = 'translate(-50%, -50%)';
-    transitionMsg.style.fontSize = '48px';
-    transitionMsg.style.color = '#00BCD4';
-    transitionMsg.style.fontWeight = 'bold';
-    transitionMsg.style.textShadow = '0 0 20px #00BCD4';
-    transitionMsg.style.zIndex = '1000';
-    transitionMsg.style.padding = '20px';
-    transitionMsg.style.background = 'rgba(0,0,0,0.8)';
-    transitionMsg.style.borderRadius = '10px';
-    transitionMsg.innerHTML = `NIVEAU ${gameState.level} TERMINÉ !<br>Prêt pour le niveau ${gameState.level + 1}?`;
-    document.body.appendChild(transitionMsg);
+    transitions.startTransition('levelUp', `NIVEAU ${gameState.level} TERMINÉ!`);
     
     setTimeout(() => {
       startNextLevel();
-      transitionMsg.remove();
     }, 2000);
-    
     return;
-  }
-  
-  document.getElementById('game-over-screen').classList.remove('hidden');
-  
-  const title = document.getElementById('game-over-title');
-  const message = document.getElementById('game-over-message');
-  
-  if (won) {
-    title.textContent = '🎉 Victoire Totale !';
-    title.style.color = '#FFD700';
-    message.textContent = `Score final: ${gameState.score} - FÉLICITIONS! Vous avez terminé tous les niveaux!`;
+  } else if (won && gameState.level === 5) {
+    leaderboard.submitScore(0, gameState.score); // Global
+    transitions.startTransition('victory', '🎉 VICTOIRE TOTALE! 🎉');
+    particles.levelUp(canvas.width/2, canvas.height/2);
+    
+    setTimeout(() => {
+      document.getElementById('game-over-screen').classList.remove('hidden');
+      document.getElementById('game-over-title').textContent = '🎉 Victoire Totale !';
+      document.getElementById('game-over-title').style.color = '#FFD700';
+      document.getElementById('game-over-message').textContent = 
+        `Score final: ${gameState.score} - FÉLICITIONS! Vous avez terminé tous les niveaux!`;
+    }, 2000);
+    return;
   } else {
-    title.textContent = '💀 Game Over';
-    title.style.color = '#FF6B6B';
-    message.textContent = `Score final: ${gameState.score} - Vous avez été éliminé !`;
+    transitions.startTransition('gameOver', '💀 Game Over');
+    setTimeout(() => {
+      document.getElementById('game-over-screen').classList.remove('hidden');
+      document.getElementById('game-over-title').textContent = '💀 Game Over';
+      document.getElementById('game-over-title').style.color = '#FF6B6B';
+      document.getElementById('game-over-message').textContent = 
+        `Score final: ${gameState.score} - Vous avez été éliminé !`;
+    }, 1000);
+    return;
   }
 }
 
+function startNextLevel() {
+  loadLevel(gameState.level + 1);
+}
+
 function restartGame() {
-  gameState.level = 1;
-  gameState.running = false;
-  gameState.score = 0;
-  gameState.timeLeft = 60;
-  
   if (document.getElementById('level-transition')) document.getElementById('level-transition').remove();
   
   document.getElementById('start-screen').classList.remove('hidden');
   document.getElementById('game-over-screen').classList.add('hidden');
-  document.getElementById('score-board').classList.add('hidden');
-  document.getElementById('level-info').classList.add('hidden');
-  document.getElementById('timer').classList.add('hidden');
-  document.getElementById('controls-hint').classList.add('hidden');
-  document.getElementById('health-bar').classList.add('hidden');
+  document.getElementById('menu-overlay')?.classList.add('hidden');
   
-  initLevel();
-  render();
-}
-
-function startNextLevel() {
-  gameState.level++;
   gameState.score = 0;
-  gameState.timeLeft = 60 + (gameState.level - 1) * 10;
-  gameState.running = true;
-  gameState.lastTime = performance.now();
+  gameState.timeLeft = 60;
   
-  document.getElementById('score-board').classList.remove('hidden');
-  document.getElementById('level-info').classList.remove('hidden');
-  document.getElementById('timer').classList.remove('hidden');
-  document.getElementById('controls-hint').classList.remove('hidden');
-  document.getElementById('health-bar').classList.remove('hidden');
-  document.getElementById('level').textContent = gameState.level;
-  
-  initLevel();
+  loadLevel(1);
   requestAnimationFrame(gameLoop);
 }
 
 // Initialize
 resizeCanvas();
-initLevel();
-render();
+// Don't start game yet - show menu first!
