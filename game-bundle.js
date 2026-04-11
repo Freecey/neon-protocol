@@ -3000,6 +3000,8 @@
     document.getElementById("start-screen").classList.add("hidden");
     document.getElementById("game-over-screen").classList.add("hidden");
     document.getElementById("menu-overlay")?.classList.add("hidden");
+    audio.init();
+    audio.playMusic();
     loadLevel(1);
     requestAnimationFrame(gameLoop);
   }
@@ -3065,13 +3067,12 @@
     console.log("NEON PROTOCOL v5.3 ready!");
   })();
 })();
-
-  // EXPOSE GLOBAL FUNCTIONS
+  // EXPOSE GLOBAL
   if (typeof window !== 'undefined') {
     window.startGame = window.startGame || startGame;
     window.restartGame = window.restartGame || restartGame;
     window.startNextLevel = window.startNextLevel || startNextLevel;
     window.initLevel = window.initLevel || initLevel;
   }
-  console.log('NEON PROTOCOL v5.4 - Success!');
+  console.log('NEON PROTOCOL v5.4.1 - Audio Complete!');
 });
