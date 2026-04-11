@@ -2027,6 +2027,9 @@
   };
 
   // game.js
+  if (typeof window !== "undefined") {
+    window.__NEON_PROTOCOL_GLOBALS__ = {};
+  }
   var MobileTouchControls = null;
   if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     Promise.resolve().then(() => __toESM(require_mobile_controls())).then((mod) => {
@@ -2036,6 +2039,17 @@
       }
     }).catch(() => console.log("Mobile controls not available"));
   }
+  Object.assign(typeof window !== "undefined" ? window.__NEON_PROTOCOL_GLOBALS__ : {}, {
+    TransitionSystem,
+    LeaderboardSystem,
+    AchievementSystem,
+    ParticleSystem2,
+    ComboSystem,
+    PowerUpSystem,
+    MenuSystem,
+    LevelManager,
+    Boss
+  });
   var canvas = document.getElementById("game-canvas");
   var ctx = canvas.getContext("2d");
   var transitions = new TransitionSystem();
@@ -2466,11 +2480,13 @@
   resizeCanvas();
   initLevel();
   render();
-  Object.assign(window, {
-    startGame,
-    restartGame,
-    startNextLevel,
-    initLevel
-  });
-  console.log("NEON PROTOCOL v5.3 loaded! Functions exposed.");
+  (function() {
+    if (typeof window !== "undefined") {
+      window.startGame = window.startGame || startGame;
+      window.restartGame = window.restartGame || restartGame;
+      window.startNextLevel = window.startNextLevel || startNextLevel;
+      window.initLevel = window.initLevel || initLevel;
+    }
+    console.log("NEON PROTOCOL v5.3 ready!");
+  })();
 })();

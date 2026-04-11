@@ -1,6 +1,11 @@
 // 🎮 NEON PROTOCOL v5.2 - INTÉGRATION COMPLÈTE
 // Menu + Progression + Transitions + Particules + Combo + Leaderboard + Achievements
 
+// GLOBAL EXPOSE (CRITICAL BEFORE ANYTHING ELSE)
+if (typeof window !== 'undefined') {
+  window.__NEON_PROTOCOL_GLOBALS__ = {};
+}
+
 import TransitionSystem from './src/systems/TransitionSystem.js';
 import { LeaderboardSystem } from './src/systems/LeaderboardSystem.js';
 import { AchievementSystem } from './src/systems/AchievementSystem.js';
@@ -22,6 +27,19 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     }
   }).catch(() => console.log('Mobile controls not available'));
 }
+
+// EXPOSE TO GLOBAL BEFORE BUNDLE (This must happen at module level)
+Object.assign(typeof window !== 'undefined' ? window.__NEON_PROTOCOL_GLOBALS__ : {}, {
+  TransitionSystem,
+  LeaderboardSystem,
+  AchievementSystem,
+  ParticleSystem2,
+  ComboSystem,
+  PowerUpSystem,
+  MenuSystem,
+  LevelManager,
+  Boss
+});
 
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -611,12 +629,13 @@ resizeCanvas();
 initLevel();
 render();
 
-// CRITICAL EXPOSE TO GLOBAL (must be before bundle)
-Object.assign(window, {
-  startGame,
-  restartGame,
-  startNextLevel,
-  initLevel
-});
-
-console.log('NEON PROTOCOL v5.3 loaded! Functions exposed.');
+// CRITICAL: Must be at the very end so functions are defined before exposing
+(function() {
+  if (typeof window !== 'undefined') {
+    window.startGame = window.startGame || startGame;
+    window.restartGame = window.restartGame || restartGame;
+    window.startNextLevel = window.startNextLevel || startNextLevel;
+    window.initLevel = window.initLevel || initLevel;
+  }
+  console.log('NEON PROTOCOL v5.3 ready!');
+})();
