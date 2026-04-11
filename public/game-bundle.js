@@ -2660,6 +2660,17 @@
   __name(resizeCanvas, "resizeCanvas");
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
+  function updateUI() {
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+    const comboEl = document.getElementById("combo");
+    const levelEl = document.getElementById("level");
+    if (scoreEl) scoreEl.textContent = gameState.score;
+    if (timerEl) timerEl.textContent = Math.ceil(gameState.timeLeft);
+    if (comboEl) comboEl.textContent = "x" + gameState.comboMultiplier.toFixed(1);
+    if (levelEl) levelEl.textContent = gameState.level;
+  }
+  __name(updateUI, "updateUI");
   function initLevel() {
     loadLevel(1);
     render();
