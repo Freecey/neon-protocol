@@ -34,7 +34,31 @@ export class LeaderboardSystem {
   }
   
   save() {
-    localStorage.setItem('neon-protocol-leaderboard', JSON.stringify(this.data));
+    try {
+      localStorage.setItem('neon-protocol-leaderboard', JSON.stringify(this.data));
+    } catch (error) {
+      console.warn("⚠️ localStorage write failed:", error.message);
+      if (error.name === 'QuotaExceededError') {
+        this.handleQuotaExceeded();
+      }
+    }
+  }
+  
+  handleQuotaExceeded() {
+    console.log("🧹 Cleaning old localStorage data...");
+    localStorage.removeItem("neon-protocol-leaderboard");
+    const minimalData = {
+      global: { highest: this.data.global.highest },
+      levels: Object.fromEntries(
+        Object.entries(this.data.levels).slice(0, 3)
+      )
+    };
+    try {
+      localStorage.setItem("neon-protocol-leaderboard", JSON.stringify(minimalData));
+      this.data = minimalData;
+    } catch (e) {
+      console.error("❌ Cannot save after cleanup, discarding changes");
+    }
   }
   
   submitScore(level, score, timestamp = Date.now()) {

@@ -42,7 +42,27 @@ export class AchievementSystem {
   }
   
   save() {
-    localStorage.setItem('neon-protocol-achievements', JSON.stringify(this.achievements));
+    try {
+      localStorage.setItem('neon-protocol-achievements', JSON.stringify(this.achievements));
+    } catch (error) {
+      console.warn("⚠️ localStorage write failed:", error.message);
+      if (error.name === 'QuotaExceededError') {
+        this.handleQuotaExceeded();
+      }
+    }
+  }
+  
+  handleQuotaExceeded() {
+    console.log("🧹 Cleaning old localStorage data...");
+    localStorage.removeItem("neon-protocol-achievements");
+    // Keep only unlocked achievements to reduce storage
+    const minimalData = this.achievements.filter(a => a.unlocked);
+    try {
+      localStorage.setItem("neon-protocol-achievements", JSON.stringify(minimalData));
+      this.achievements = minimalData;
+    } catch (e) {
+      console.error("❌ Cannot save after cleanup, discarding changes");
+    }
   }
   
   updateStats(what, amount = 1) {

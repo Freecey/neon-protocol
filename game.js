@@ -117,8 +117,32 @@ document.addEventListener('keyup', (e) => keys[e.code] = false);
 
 // CANVAS SIZE
 function resizeCanvas() {
-  canvas.width = canvas.parentElement.clientWidth;
-  canvas.height = canvas.parentElement.clientHeight;
+  const oldWidth = canvas.width;
+  const oldHeight = canvas.height;
+  
+  const newWidth = canvas.parentElement.clientWidth;
+  const newHeight = canvas.parentElement.clientHeight;
+  
+  // Guard division by zero
+  if (oldWidth === 0 || oldHeight === 0) {
+    canvas.width = newWidth;
+    canvas.height = newHeight;
+    return;
+  }
+  
+  canvas.width = newWidth;
+  canvas.height = newHeight;
+  
+  const scaleX = newWidth / oldWidth;
+  const scaleY = newHeight / oldHeight;
+  
+  if (player && gameState && gameState.platforms) {
+    player.x = Math.min(Math.max(0, player.x * scaleX), canvas.width - player.width);
+    player.y = Math.min(Math.max(0, player.y * scaleY), canvas.height - player.height);
+    gameState.platforms.forEach(p => {
+      p.y = Math.max(0, p.y * scaleY);
+    });
+  }
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
@@ -127,56 +151,7 @@ resizeCanvas();
 function updateUI() {
   const scoreEl = document.getElementById('score');
 
-// FIXED: Safe player scaling with bounds checking
-function resizeCanvas() {
-  const oldWidth = canvas.width;
-  const oldHeight = canvas.height;
-  
-  canvas.width = canvas.parentElement.clientWidth;
-  canvas.height = canvas.parentElement.clientHeight;
-  
-  const scaleX = canvas.width / oldWidth;
-  const scaleY = canvas.height / oldHeight;
-  
-  // Safe scaling with bounds
-  if (player && gameState && gameState.platforms) {
-    // Scale player with bounds check
-    player.x = Math.min(
-      Math.max(0, player.x * scaleX),
-      canvas.width - player.width
-    );
-    player.y = Math.min(
-      Math.max(0, player.y * scaleY),
-      canvas.height - player.height
-    );
-    
-    // Scale platforms Y with bounds
-    gameState.platforms.forEach(p => {
-      p.y = Math.max(0, p.y * scaleY);
-    });
-  }
-}
-function resizeCanvas() {
-  const oldWidth = canvas.width;
-  const oldHeight = canvas.height;
-  
-  canvas.width = canvas.parentElement.clientWidth;
-  canvas.height = canvas.parentElement.clientHeight;
-  
-  const scaleX = canvas.width / oldWidth;
-  const scaleY = canvas.height / oldHeight;
-  
-  // Preserve player position
-  if (gameState && gameState.platforms && player) {
-    player.x *= scaleX;
-    player.y *= scaleY;
-    
-    // Scale platforms Y
-    gameState.platforms.forEach(p => {
-      p.y *= scaleY;
-    });
-  }
-}
+
   const timerEl = document.getElementById('timer');
   const comboEl = document.getElementById('combo');
   const levelEl = document.getElementById('level');
