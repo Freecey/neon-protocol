@@ -5,6 +5,7 @@
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
   var __commonJS = (cb, mod) => function __require() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
@@ -28,7 +29,7 @@
   // src/mobile/mobile-controls.js
   var require_mobile_controls = __commonJS({
     "src/mobile/mobile-controls.js"(exports, module) {
-      var MobileTouchControls2 = class {
+      var _MobileTouchControls = class _MobileTouchControls {
         constructor() {
           this.touchStartX = 0;
           this.touchStartY = 0;
@@ -96,7 +97,7 @@
           }, 50);
         }
         setupUIControls() {
-          const createButton = (id, action) => {
+          const createButton = /* @__PURE__ */ __name((id, action) => {
             const btn = document.createElement("div");
             btn.id = id;
             btn.className = "mobile-btn";
@@ -113,7 +114,7 @@
               this.releaseButton(action);
             }, { passive: false });
             return btn;
-          };
+          }, "createButton");
           const controlsContainer = document.createElement("div");
           controlsContainer.id = "mobile-controls";
           controlsContainer.style.cssText = `
@@ -226,6 +227,8 @@
           }
         }
       };
+      __name(_MobileTouchControls, "MobileTouchControls");
+      var MobileTouchControls2 = _MobileTouchControls;
       if (typeof module !== "undefined" && module.exports) {
         module.exports = MobileTouchControls2;
       } else {
@@ -235,7 +238,7 @@
   });
 
   // src/systems/TransitionSystem.js
-  var TransitionSystem = class {
+  var _TransitionSystem = class _TransitionSystem {
     constructor() {
       this.state = "idle";
       this.alpha = 0;
@@ -411,9 +414,11 @@
       this.text = "";
     }
   };
+  __name(_TransitionSystem, "TransitionSystem");
+  var TransitionSystem = _TransitionSystem;
 
   // src/systems/LeaderboardSystem.js
-  var LeaderboardSystem = class {
+  var _LeaderboardSystem = class _LeaderboardSystem {
     constructor() {
       this.data = this.load();
       this.recentScores = [];
@@ -499,9 +504,11 @@
       this.recentScores = [];
     }
   };
+  __name(_LeaderboardSystem, "LeaderboardSystem");
+  var LeaderboardSystem = _LeaderboardSystem;
 
   // src/systems/AchievementSystem.js
-  var AchievementSystem = class {
+  var _AchievementSystem = class _AchievementSystem {
     constructor(leaderboard2) {
       this.leaderboard = leaderboard2;
       this.achievements = this.load();
@@ -525,16 +532,16 @@
       }
       return [
         { id: "welcome", name: "Bienvenue!", desc: "Jouer \xE0 NEON PROTOCOL", unlocked: false },
-        { id: "firstScore", name: "Premier Score", desc: "Atteindre 100 points", unlocked: false, condition: (stats) => stats.coinsCollected >= 5 },
-        { id: "coinHunter", name: "Chasseur de Pi\xE8ces", desc: "Collecter 50 pi\xE8ces", unlocked: false, condition: (s) => s.coinsCollected >= 50 },
-        { id: "masterJumper", name: "Ma\xEEtre du Saut", desc: "Faire 100 sauts", unlocked: false, condition: (s) => s.jumps >= 100 },
-        { id: "survivor", name: "Survivant", desc: "Survivre 60 secondes", unlocked: false, condition: (s) => s.timeSurvived >= 60 },
+        { id: "firstScore", name: "Premier Score", desc: "Atteindre 100 points", unlocked: false, condition: /* @__PURE__ */ __name((stats) => stats.coinsCollected >= 5, "condition") },
+        { id: "coinHunter", name: "Chasseur de Pi\xE8ces", desc: "Collecter 50 pi\xE8ces", unlocked: false, condition: /* @__PURE__ */ __name((s) => s.coinsCollected >= 50, "condition") },
+        { id: "masterJumper", name: "Ma\xEEtre du Saut", desc: "Faire 100 sauts", unlocked: false, condition: /* @__PURE__ */ __name((s) => s.jumps >= 100, "condition") },
+        { id: "survivor", name: "Survivant", desc: "Survivre 60 secondes", unlocked: false, condition: /* @__PURE__ */ __name((s) => s.timeSurvived >= 60, "condition") },
         { id: "speedDemon", name: "D\xE9mon Vitesse", desc: "Survivre avec bonus temps > 50s", unlocked: false },
-        { id: "bossSlayer", name: "Tueur de Boss", desc: "Vaincre un boss", unlocked: false, condition: (s) => s.kills >= 1 },
+        { id: "bossSlayer", name: "Tueur de Boss", desc: "Vaincre un boss", unlocked: false, condition: /* @__PURE__ */ __name((s) => s.kills >= 1, "condition") },
         { id: "chaosMode", name: "Mode Chaos", desc: "Survivre au Niveau 7", unlocked: false },
-        { id: "collector", name: "Perfectionniste", desc: "Collecter 100% des pi\xE8ces", unlocked: false, condition: (s, score) => score >= 2e3 },
-        { id: "timeMaster", name: "Ma\xEEtre du Temps", desc: "Utiliser Time Stop 10 fois", unlocked: false, condition: (s) => s.timeStopsUsed >= 10 },
-        { id: "powerUpMaster", name: "Ma\xEEtre Power-up", desc: "Utiliser 50 power-ups", unlocked: false, condition: (s) => s.powerUpsUsed >= 50 }
+        { id: "collector", name: "Perfectionniste", desc: "Collecter 100% des pi\xE8ces", unlocked: false, condition: /* @__PURE__ */ __name((s, score) => score >= 2e3, "condition") },
+        { id: "timeMaster", name: "Ma\xEEtre du Temps", desc: "Utiliser Time Stop 10 fois", unlocked: false, condition: /* @__PURE__ */ __name((s) => s.timeStopsUsed >= 10, "condition") },
+        { id: "powerUpMaster", name: "Ma\xEEtre Power-up", desc: "Utiliser 50 power-ups", unlocked: false, condition: /* @__PURE__ */ __name((s) => s.powerUpsUsed >= 50, "condition") }
       ];
     }
     save() {
@@ -616,9 +623,11 @@
       this.achievements = this.load();
     }
   };
+  __name(_AchievementSystem, "AchievementSystem");
+  var AchievementSystem = _AchievementSystem;
 
   // src/systems/ParticleSystem2.js
-  var ParticleSystem2 = class {
+  var _ParticleSystem2 = class _ParticleSystem2 {
     constructor() {
       this.particles = [];
       this.maxParticles = 200;
@@ -1018,9 +1027,11 @@
       this.particles = [];
     }
   };
+  __name(_ParticleSystem2, "ParticleSystem2");
+  var ParticleSystem2 = _ParticleSystem2;
 
   // src/systems/ComboSystem.js
-  var ComboSystem = class {
+  var _ComboSystem = class _ComboSystem {
     constructor() {
       this.comboCount = 0;
       this.comboTime = 0;
@@ -1073,9 +1084,11 @@
       return `${this.comboMultiplier}x <span style="color:${color}">${this.comboCount}</span>`;
     }
   };
+  __name(_ComboSystem, "ComboSystem");
+  var ComboSystem = _ComboSystem;
 
   // src/systems/PowerUpSystem.js
-  var PowerUpSystem = class {
+  var _PowerUpSystem = class _PowerUpSystem {
     constructor() {
       this.particles = [];
     }
@@ -1170,9 +1183,11 @@
       return this.magnetEnd && Date.now() < this.magnetEnd;
     }
   };
+  __name(_PowerUpSystem, "PowerUpSystem");
+  var PowerUpSystem = _PowerUpSystem;
 
   // src/systems/ui/MenuSystem.js
-  var MenuSystem = class {
+  var _MenuSystem = class _MenuSystem {
     constructor() {
       this.state = "title";
       this.levelSelection = 1;
@@ -1334,9 +1349,11 @@
       this.showCredits = show;
     }
   };
+  __name(_MenuSystem, "MenuSystem");
+  var MenuSystem = _MenuSystem;
 
   // src/entities/Boss.js
-  var Boss = class {
+  var _Boss = class _Boss {
     constructor(x, y, level) {
       this.x = x;
       this.y = y;
@@ -1457,9 +1474,11 @@
       return this.projectiles;
     }
   };
+  __name(_Boss, "Boss");
+  var Boss = _Boss;
 
   // src/levels/Level6.js
-  var Level6 = class {
+  var _Level6 = class _Level6 {
     constructor(gameWidth, gameHeight) {
       this.width = gameWidth;
       this.height = gameHeight;
@@ -1556,9 +1575,11 @@
       });
     }
   };
+  __name(_Level6, "Level6");
+  var Level6 = _Level6;
 
   // src/levels/Level7.js
-  var Level7 = class {
+  var _Level7 = class _Level7 {
     constructor(gameWidth, gameHeight) {
       this.width = gameWidth;
       this.height = gameHeight;
@@ -1833,9 +1854,11 @@
       return this.bosses;
     }
   };
+  __name(_Level7, "Level7");
+  var Level7 = _Level7;
 
   // src/levels/LevelManager.js
-  var LevelManager = class {
+  var _LevelManager = class _LevelManager {
     constructor() {
       this.level = 1;
       this.currentLevel = null;
@@ -2025,6 +2048,8 @@
       this.screenHeight = height;
     }
   };
+  __name(_LevelManager, "LevelManager");
+  var LevelManager = _LevelManager;
 
   // game.js
   if (typeof window !== "undefined") {
@@ -2108,6 +2133,7 @@
     canvas.width = canvas.parentElement.clientWidth;
     canvas.height = canvas.parentElement.clientHeight;
   }
+  __name(resizeCanvas, "resizeCanvas");
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
   function loadLevel(levelNum) {
@@ -2141,6 +2167,7 @@
       transitions.startTransition("levelUp", `NIVEAU ${gameState2.level} COMMENC\xC9!`);
     }
   }
+  __name(loadLevel, "loadLevel");
   function gameLoop(timestamp) {
     if (!gameState2.running) return;
     const deltaTime = timestamp - gameState2.lastTime;
@@ -2149,6 +2176,7 @@
     render();
     requestAnimationFrame(gameLoop);
   }
+  __name(gameLoop, "gameLoop");
   function update(deltaTime) {
     let currentSpeed = player.speed;
     if (player.speedBoost) currentSpeed *= 2;
@@ -2239,6 +2267,7 @@
       }
     }
   }
+  __name(update, "update");
   function updateEnemies() {
     if (gameState2.enemies.length === 0 && gameState2.bosses.length === 0 && gameState2.timeLeft <= 0) {
       gameOver(true);
@@ -2284,6 +2313,7 @@
       }
     }
   }
+  __name(updateEnemies, "updateEnemies");
   function updateCoins() {
     for (let i = gameState2.coins.length - 1; i >= 0; i--) {
       const coin = gameState2.coins[i];
@@ -2303,6 +2333,7 @@
       }
     }
   }
+  __name(updateCoins, "updateCoins");
   function updatePowerUps() {
     for (let i = gameState2.powerUpsList.length - 1; i >= 0; i--) {
       const pu = gameState2.powerUpsList[i];
@@ -2344,6 +2375,7 @@
       }
     }
   }
+  __name(updatePowerUps, "updatePowerUps");
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     levelManager.render(ctx);
@@ -2404,6 +2436,7 @@
       ctx.fillText(combo.getComboText(), canvas.width - 100, 50);
     }
   }
+  __name(render, "render");
   function getEnemyColor(type) {
     switch (type) {
       case "walker":
@@ -2416,14 +2449,17 @@
         return "#FF6B6B";
     }
   }
+  __name(getEnemyColor, "getEnemyColor");
   function checkCollision(obj1, obj2) {
     return obj1.x < obj2.x + obj2.width && obj1.x + obj1.width > obj2.x && obj1.y < obj2.y + obj2.height && obj1.y + obj1.height > obj2.y;
   }
+  __name(checkCollision, "checkCollision");
   function updateScore() {
     document.getElementById("score").textContent = gameState2.score;
     leaderboard.data.global.highest = Math.max(leaderboard.data.global.highest, gameState2.score);
     leaderboard.save();
   }
+  __name(updateScore, "updateScore");
   function startGame() {
     if (document.getElementById("level-transition")) document.getElementById("level-transition").remove();
     document.getElementById("start-screen").classList.add("hidden");
@@ -2432,6 +2468,7 @@
     loadLevel(1);
     requestAnimationFrame(gameLoop);
   }
+  __name(startGame, "startGame");
   function gameOver(won) {
     gameState2.running = false;
     leaderboard.submitScore(gameState2.level, gameState2.score);
@@ -2464,9 +2501,11 @@
       return;
     }
   }
+  __name(gameOver, "gameOver");
   function startNextLevel() {
     loadLevel(gameState2.level + 1);
   }
+  __name(startNextLevel, "startNextLevel");
   function restartGame() {
     if (document.getElementById("level-transition")) document.getElementById("level-transition").remove();
     document.getElementById("start-screen").classList.remove("hidden");
@@ -2477,6 +2516,7 @@
     loadLevel(1);
     requestAnimationFrame(gameLoop);
   }
+  __name(restartGame, "restartGame");
   resizeCanvas();
   initLevel();
   render();
