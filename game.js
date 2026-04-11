@@ -114,6 +114,22 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
+// LEVEL INITIALIZATION - FIX FOR MISSING FUNCTION
+function initLevel() {
+  // Initialize first level
+  loadLevel(1);
+  render();
+  updateUI();
+  
+  // Show intro message
+  const message = document.createElement('div');
+  message.innerHTML = '<strong>🎮 NEON PROTOCOL</strong><br>Aide JP!<br>Succès : Survivre 60s';
+  message.style.cssText = 'position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); color:#00bcd4; font-size:24px; font-family:JetBrains Mono; text-align:center; animation:fadeIn 1s;';
+  document.getElementById('game-canvas').parentElement.appendChild(message);
+  
+  setTimeout(() => message.remove(), 3000);
+}
+
 // LEVEL INITIALIZATION
 function loadLevel(levelNum) {
   gameState.level = levelNum;
