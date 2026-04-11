@@ -126,6 +126,36 @@ resizeCanvas();
 // UI UPDATE FUNCTION
 function updateUI() {
   const scoreEl = document.getElementById('score');
+
+// FIXED: Safe player scaling with bounds checking
+function resizeCanvas() {
+  const oldWidth = canvas.width;
+  const oldHeight = canvas.height;
+  
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = canvas.parentElement.clientHeight;
+  
+  const scaleX = canvas.width / oldWidth;
+  const scaleY = canvas.height / oldHeight;
+  
+  // Safe scaling with bounds
+  if (player && gameState && gameState.platforms) {
+    // Scale player with bounds check
+    player.x = Math.min(
+      Math.max(0, player.x * scaleX),
+      canvas.width - player.width
+    );
+    player.y = Math.min(
+      Math.max(0, player.y * scaleY),
+      canvas.height - player.height
+    );
+    
+    // Scale platforms Y with bounds
+    gameState.platforms.forEach(p => {
+      p.y = Math.max(0, p.y * scaleY);
+    });
+  }
+}
 function resizeCanvas() {
   const oldWidth = canvas.width;
   const oldHeight = canvas.height;

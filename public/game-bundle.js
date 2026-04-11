@@ -2697,6 +2697,28 @@
       canvas.height = canvas.parentElement.clientHeight;
       const scaleX = canvas.width / oldWidth;
       const scaleY = canvas.height / oldHeight;
+      if (player && gameState && gameState.platforms) {
+        player.x = Math.min(
+          Math.max(0, player.x * scaleX),
+          canvas.width - player.width
+        );
+        player.y = Math.min(
+          Math.max(0, player.y * scaleY),
+          canvas.height - player.height
+        );
+        gameState.platforms.forEach((p) => {
+          p.y = Math.max(0, p.y * scaleY);
+        });
+      }
+    }
+    __name(resizeCanvas2, "resizeCanvas");
+    function resizeCanvas2() {
+      const oldWidth = canvas.width;
+      const oldHeight = canvas.height;
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      const scaleX = canvas.width / oldWidth;
+      const scaleY = canvas.height / oldHeight;
       if (gameState && gameState.platforms && player) {
         player.x *= scaleX;
         player.y *= scaleY;
