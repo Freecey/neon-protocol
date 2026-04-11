@@ -3064,12 +3064,14 @@
     }
     console.log("NEON PROTOCOL v5.3 ready!");
   })();
+})();
 
+  // EXPOSE GLOBAL FUNCTIONS
   if (typeof window !== 'undefined') {
     window.startGame = window.startGame || startGame;
     window.restartGame = window.restartGame || restartGame;
     window.startNextLevel = window.startNextLevel || startNextLevel;
     window.initLevel = window.initLevel || initLevel;
   }
-  console.log('NEON PROTOCOL v5.4 - All systems loaded!');
+  console.log('NEON PROTOCOL v5.4 - Success!');
 });
