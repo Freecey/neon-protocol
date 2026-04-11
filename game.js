@@ -126,6 +126,27 @@ resizeCanvas();
 // UI UPDATE FUNCTION
 function updateUI() {
   const scoreEl = document.getElementById('score');
+function resizeCanvas() {
+  const oldWidth = canvas.width;
+  const oldHeight = canvas.height;
+  
+  canvas.width = canvas.parentElement.clientWidth;
+  canvas.height = canvas.parentElement.clientHeight;
+  
+  const scaleX = canvas.width / oldWidth;
+  const scaleY = canvas.height / oldHeight;
+  
+  // Preserve player position
+  if (gameState && gameState.platforms && player) {
+    player.x *= scaleX;
+    player.y *= scaleY;
+    
+    // Scale platforms Y
+    gameState.platforms.forEach(p => {
+      p.y *= scaleY;
+    });
+  }
+}
   const timerEl = document.getElementById('timer');
   const comboEl = document.getElementById('combo');
   const levelEl = document.getElementById('level');
