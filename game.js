@@ -188,7 +188,7 @@ function loadLevel(levelNum) {
   
   // Reset player
   player.x = 100;
-  player.y = 300;
+  player.y = 100; // START FROM TOP, NOT 300 (to avoid falling through missing ground)
   player.health = 100;
   player.vx = 0;
   player.vy = 0;
@@ -196,13 +196,22 @@ function loadLevel(levelNum) {
   player.speedBoost = false;
   player.invisible = false;
   
-  // Use LevelManager
+  // Ensure ground is generated and player starts on it
   levelManager.loadLevel(levelNum);
   gameState.platforms = levelManager.platforms;
   gameState.enemies = levelManager.enemies;
   gameState.coins = levelManager.coins;
   gameState.powerUpsList = levelManager.powerups;
   gameState.bosses = levelManager.getBosses();
+  
+  // CRITICAL: Find first platform to position player on
+  const firstPlatform = gameState.platforms.find(p => p.type === 'ground');
+  if (firstPlatform) {
+    player.y = firstPlatform.y - player.height - 5;
+  } else {
+    // Fallback: position player 100px from top
+    player.y = 100;
+  }
   
   // Update UI
   updateScore();
