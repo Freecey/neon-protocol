@@ -2469,4 +2469,6 @@
   window.startGame = startGame;
   window.restartGame = restartGame;
   window.startNextLevel = startNextLevel;
+  window.initLevel = initLevel;
+  console.log("NEON PROTOCOL v5.3 loaded! Functions exposed to window.");
 })();
