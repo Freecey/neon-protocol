@@ -1,238 +1,257 @@
 (() => {
-  var __create = Object.create;
   var __defProp = Object.defineProperty;
-  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
-  var __getProtoOf = Object.getPrototypeOf;
-  var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
-  var __commonJS = (cb, mod) => function __require() {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  var __esm = (fn, res) => function __init() {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
   };
-  var __copyProps = (to, from, except, desc) => {
-    if (from && typeof from === "object" || typeof from === "function") {
-      for (let key of __getOwnPropNames(from))
-        if (!__hasOwnProp.call(to, key) && key !== except)
-          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-    }
-    return to;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
   };
-  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-    // If the importer is in node compatibility mode or this is not an ESM
-    // file that has been converted to a CommonJS file using a Babel-
-    // compatible transform (i.e. "__esModule" has not been set), then set
-    // "default" to the CommonJS "module.exports" for node compatibility.
-    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-    mod
-  ));
 
-  // src/mobile/mobile-controls.js
-  var require_mobile_controls = __commonJS({
-    "src/mobile/mobile-controls.js"(exports, module) {
-      var _MobileTouchControls = class _MobileTouchControls {
+  // src/mobile/mobile-controls-complete.js
+  var mobile_controls_complete_exports = {};
+  __export(mobile_controls_complete_exports, {
+    MobileTouchControls: () => MobileTouchControls
+  });
+  var _MobileTouchControls, MobileTouchControls;
+  var init_mobile_controls_complete = __esm({
+    "src/mobile/mobile-controls-complete.js"() {
+      _MobileTouchControls = class _MobileTouchControls {
         constructor() {
-          this.touchStartX = 0;
-          this.touchStartY = 0;
-          this.touchEndX = 0;
-          this.touchEndY = 0;
+          this.enabled = navigator.maxTouchPoints > 0;
+          if (!this.enabled) {
+            console.log("\u26A0\uFE0F Touch support disabled - not a touch device");
+            return;
+          }
+          this.touchButtons = {
+            left: { active: false, id: null, rect: null },
+            right: { active: false, id: null, rect: null },
+            jump: { active: false, id: null, rect: null }
+          };
+          this.touchZoneLeft = { x: 0, y: 0, width: 120, height: 120 };
+          this.touchZoneRight = { x: 0, y: 0, width: 120, height: 120 };
+          this.touchZoneJump = { x: 0, y: window.innerHeight - 150, width: 100, height: 100 };
           this.swipeThreshold = 30;
+          this.swipeStartX = 0;
+          this.swipeStartY = 0;
+          this.swipeActive = false;
           this.touchActive = false;
+          this.lastTouchId = null;
+          this.orientation = window.innerWidth > window.innerHeight ? "landscape" : "portrait";
+          this.init();
+        }
+        init() {
           this.setupTouchEvents();
           this.setupUIControls();
+          this.updateZones();
+          window.addEventListener("resize", () => this.updateZones());
+          window.addEventListener("orientationchange", () => this.updateZones());
+          console.log("\u{1F4F1} Mobile controls initialized!");
         }
-        setupTouchEvents() {
-          document.addEventListener("touchstart", (e) => {
-            if (e.touches.length === 1) {
-              this.touchStartX = e.touches[0].clientX;
-              this.touchStartY = e.touches[0].clientY;
-              this.touchActive = true;
-            }
-          }, { passive: false });
-          document.addEventListener("touchend", (e) => {
-            if (this.touchActive) {
-              this.touchEndX = e.changedTouches[0].clientX;
-              this.touchEndY = e.changedTouches[0].clientY;
-              this.handleGesture();
-              this.touchActive = false;
-              e.preventDefault();
-            }
-          }, { passive: false });
-          document.addEventListener("touchmove", (e) => {
-            if (e.touches.length === 2 && gameState.running) {
-              e.preventDefault();
-              const touch1 = e.touches[0];
-              const touch2 = e.touches[1];
-              if (touch1.clientX < touch2.clientX) {
-                keys["ArrowLeft"] = true;
-              } else {
-                keys["ArrowRight"] = true;
-              }
-              if (touch2.clientY < touch1.clientY) {
-                keys["Space"] = true;
-              }
-            }
-          }, { passive: false });
-        }
-        handleGesture() {
-          const dx = this.touchEndX - this.touchStartX;
-          const dy = this.touchEndY - this.touchStartY;
-          if (Math.abs(dx) > Math.abs(dy)) {
-            if (dx > this.swipeThreshold) {
-              keys["ArrowRight"] = true;
-            } else if (dx < -this.swipeThreshold) {
-              keys["ArrowLeft"] = true;
-            }
-          } else {
-            if (dy > this.swipeThreshold) {
-              keys["ArrowDown"] = true;
-            } else if (dy < -this.swipeThreshold) {
-              keys["Space"] = true;
-            }
-          }
-          setTimeout(() => {
-            keys["ArrowRight"] = false;
-            keys["ArrowLeft"] = false;
-            keys["ArrowDown"] = false;
-            keys["Space"] = false;
-          }, 50);
+        updateZones() {
+          const width = window.innerWidth;
+          const height = window.innerHeight;
+          this.touchZoneLeft = { x: 20, y: height - 140, width: 100, height: 100 };
+          this.touchZoneJump = { x: width / 2 - 50, y: height - 140, width: 100, height: 100 };
+          this.touchZoneRight = { x: width - 120, y: height - 140, width: 100, height: 100 };
         }
         setupUIControls() {
-          const createButton = /* @__PURE__ */ __name((id, action) => {
-            const btn = document.createElement("div");
-            btn.id = id;
-            btn.className = "mobile-btn";
-            btn.innerHTML = action;
-            btn.style.position = "fixed";
-            btn.style.pointerEvents = "auto";
-            btn.style.userSelect = "none";
-            btn.addEventListener("touchstart", (e) => {
-              e.stopPropagation();
-              this.handleButtonClick(action);
-            }, { passive: false });
-            btn.addEventListener("touchend", (e) => {
-              e.stopPropagation();
-              this.releaseButton(action);
-            }, { passive: false });
-            return btn;
-          }, "createButton");
-          const controlsContainer = document.createElement("div");
-          controlsContainer.id = "mobile-controls";
-          controlsContainer.style.cssText = `
-      display: ${this.isTablet() ? "flex" : "none"};
+          const existing = document.querySelectorAll(".touch-btn");
+          existing.forEach((btn) => btn.remove());
+          const container = document.createElement("div");
+          container.id = "mobile-controls";
+          container.style.cssText = `
       position: fixed;
       bottom: 20px;
       left: 0;
-      width: 100%;
-      justify-content: space-between;
-      padding: 0 20px;
+      right: 0;
+      height: 140px;
       pointer-events: none;
       z-index: 1000;
-    `;
-          const leftControls = document.createElement("div");
-          leftControls.style.cssText = `
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: auto;
+      justify-content: space-between;
+      padding: 0 20px;
     `;
-          const leftBtn = createButton("mobile-left", "\u2B05\uFE0F");
-          leftBtn.style.cssText = this.btnStyle();
-          leftBtn.id = "mobile-left";
-          leftControls.appendChild(leftBtn);
-          const rightBtn = createButton("mobile-right", "\u27A1\uFE0F");
-          rightBtn.style.cssText = this.btnStyle();
-          rightBtn.id = "mobile-right";
-          rightControls.appendChild(rightBtn);
-          const rightControls = document.createElement("div");
-          rightControls.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: auto;
-    `;
-          const jumpBtn = createButton("mobile-jump", "\u2B06\uFE0F");
-          jumpBtn.style.cssText = this.btnStyle("#2196F3");
-          jumpBtn.id = "mobile-jump";
-          rightControls.appendChild(jumpBtn);
-          const downBtn = createButton("mobile-down", "\u2B07\uFE0F");
-          downBtn.style.cssText = this.btnStyle();
-          downBtn.id = "mobile-down";
-          rightControls.appendChild(downBtn);
-          controlsContainer.appendChild(leftControls);
-          controlsContainer.appendChild(rightControls);
-          document.body.appendChild(controlsContainer);
+          const leftBtn = this.createTouchButton("left", "\u25C0", "Droite");
+          container.appendChild(leftBtn);
+          const jumpBtn = this.createTouchButton("jump", "\u25B3", "Saut", "#00bcd4");
+          container.appendChild(jumpBtn);
+          const rightBtn = this.createTouchButton("right", "\u25B6", "Droite");
+          container.appendChild(rightBtn);
+          document.body.appendChild(container);
+          leftBtn.addEventListener("touchstart", (e) => this.handleTouchStart(e, "left"));
+          leftBtn.addEventListener("touchend", (e) => this.handleTouchEnd(e, "left"));
+          jumpBtn.addEventListener("touchstart", (e) => this.handleTouchStart(e, "jump"));
+          jumpBtn.addEventListener("touchend", (e) => this.handleTouchEnd(e, "jump"));
+          rightBtn.addEventListener("touchstart", (e) => this.handleTouchStart(e, "right"));
+          rightBtn.addEventListener("touchend", (e) => this.handleTouchEnd(e, "right"));
         }
-        btnStyle(color = "#E91E63") {
-          return `
-      width: 70px;
-      height: 70px;
+        createTouchButton(type, unicode, label, color = null) {
+          const btn = document.createElement("div");
+          btn.className = "touch-btn";
+          btn.textContent = unicode;
+          const size = 100;
+          const yPos = window.innerHeight - 140;
+          btn.style.cssText = `
+      position: fixed;
+      bottom: ${Math.max(20, yPos + 10)}px;
+      ${type === "jump" ? `left: ${window.innerWidth / 2 - 50}px` : type === "left" ? "left: 20px" : "right: 20px"};
+      width: ${size}px;
+      height: ${size}px;
+      background: rgba(0, 188, 212, 0.3);
+      border: 2px solid #00bcd4;
       border-radius: 50%;
-      background: ${color};
-      color: white;
-      font-size: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid white;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      transition: transform 0.1s;
-      opacity: 0.7;
+      font-size: 36px;
+      color: #fff;
+      pointer-events: auto;
+      touch-action: none;
+      transition: all 0.1s;
+      user-select: none;
+      -webkit-user-select: none;
     `;
+          if (color) {
+            btn.style.borderColor = color;
+            btn.style.background = `rgba(${color === "#00bcd4" ? "0, 188, 212" : "233, 30, 99"}, 0.4)`;
+          }
+          return btn;
         }
-        handleButtonClick(action) {
-          switch (action) {
-            case "\u2B05\uFE0F":
-              keys["ArrowLeft"] = true;
-              break;
-            case "\u27A1\uFE0F":
-              keys["ArrowRight"] = true;
-              break;
-            case "\u2B06\uFE0F":
-              keys["Space"] = true;
-              break;
-            case "\u2B07\uFE0F":
-              keys["ArrowDown"] = true;
-              break;
+        handleTouchStart(e, control) {
+          e.preventDefault();
+          const touch = e.changedTouches[0];
+          const id = touch.identifier;
+          if (control) {
+            this.touchButtons[control].active = true;
+            this.touchButtons[control].id = id;
+            const btn = document.querySelector(`.touch-btn[data-type="${control}"]`);
+            if (btn) {
+              btn.style.transform = "scale(0.9)";
+              btn.style.background = "rgba(0, 188, 212, 0.6)";
+            }
+          }
+          this.lastTouchId = id;
+          this.swipeStartX = touch.clientX;
+          this.swipeStartY = touch.clientY;
+          this.swipeActive = true;
+        }
+        handleTouchEnd(e, control) {
+          e.preventDefault();
+          if (control) {
+            this.touchButtons[control].active = false;
+            const btn = document.querySelector(`.touch-btn[data-type="${control}"]`);
+            if (btn) {
+              btn.style.transform = "scale(1)";
+              btn.style.background = "";
+            }
           }
         }
-        releaseButton(action) {
-          switch (action) {
-            case "\u2B05\uFE0F":
+        setupTouchEvents() {
+          document.addEventListener("touchstart", (e) => {
+            if (e.target.tagName === "CANVAS" || e.target.id === "game-canvas") {
+              this.touchActive = true;
+              for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                if (this.isInZone(touch.clientX, touch.clientY, this.touchZoneLeft)) {
+                  keys["ArrowLeft"] = true;
+                  if (typeof keys !== "undefined") keys["keyA"] = true;
+                }
+                if (this.isInZone(touch.clientX, touch.clientY, this.touchZoneRight)) {
+                  keys["ArrowRight"] = true;
+                  if (typeof keys !== "undefined") keys["keyD"] = true;
+                }
+                if (this.isInZone(touch.clientX, touch.clientY, this.touchZoneJump)) {
+                  keys["Space"] = true;
+                }
+              }
+            }
+          }, { passive: false, capture: true });
+          document.addEventListener("touchmove", (e) => {
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+              const touch = e.changedTouches[i];
+              this.updateZones();
+              if (this.isInZone(touch.clientX, touch.clientY, this.touchZoneLeft)) {
+                keys["ArrowLeft"] = true;
+                if (typeof keys !== "undefined") keys["keyA"] = true;
+              } else {
+                keys["ArrowLeft"] = false;
+                if (typeof keys !== "undefined") keys["keyA"] = false;
+              }
+              if (this.isInZone(touch.clientX, touch.clientY, this.touchZoneRight)) {
+                keys["ArrowRight"] = true;
+                if (typeof keys !== "undefined") keys["keyD"] = true;
+              } else {
+                keys["ArrowRight"] = false;
+                if (typeof keys !== "undefined") keys["keyD"] = false;
+              }
+            }
+          }, { passive: false, capture: true });
+          document.addEventListener("touchend", (e) => {
+            if (e.target.tagName === "CANVAS" || e.target.id === "game-canvas") {
+              this.touchActive = false;
               keys["ArrowLeft"] = false;
-              break;
-            case "\u27A1\uFE0F":
               keys["ArrowRight"] = false;
-              break;
-            case "\u2B06\uFE0F":
               keys["Space"] = false;
-              break;
-            case "\u2B07\uFE0F":
-              keys["ArrowDown"] = false;
-              break;
-          }
+              if (typeof keys !== "undefined") {
+                keys["keyA"] = false;
+                keys["keyD"] = false;
+              }
+            }
+          }, { passive: false, capture: true });
+          document.addEventListener("touchstart", (e) => {
+            if (e.target.tagName !== "CANVAS" && e.target.id !== "game-canvas") return;
+            if (e.touches.length === 1) {
+              this.swipeStartX = e.touches[0].clientX;
+              this.swipeStartY = e.touches[0].clientY;
+              this.swipeActive = true;
+            }
+          }, { passive: false });
+          document.addEventListener("touchend", (e) => {
+            if (!this.swipeActive) return;
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const dx = endX - this.swipeStartX;
+            const dy = endY - this.swipeStartY;
+            if (Math.abs(dx) > this.swipeThreshold && Math.abs(dy) < this.swipeThreshold * 2) {
+              if (dx > 0 && dx > Math.abs(dy)) {
+                keys["ArrowRight"] = true;
+                keys["keyD"] = true;
+              } else if (dx < 0 && Math.abs(dx) > Math.abs(dy)) {
+                keys["ArrowLeft"] = true;
+                keys["keyA"] = true;
+              }
+            }
+            if (Math.abs(dy) > this.swipeThreshold && Math.abs(dx) < this.swipeThreshold * 2) {
+              if (dy < 0 && Math.abs(dy) > Math.abs(dx)) {
+                keys["Space"] = true;
+              }
+            }
+            this.swipeActive = false;
+          }, { passive: false });
         }
-        isTablet() {
-          return window.innerWidth >= 600;
+        isInZone(x, y, zone) {
+          return x >= zone.x && x <= zone.x + zone.width && y >= zone.y && y <= zone.y + zone.height;
         }
-        showControls() {
-          const controls = document.getElementById("mobile-controls");
-          if (controls) {
-            controls.style.display = "flex";
-          }
+        getZoneState() {
+          return {
+            left: this.touchButtons.left.active,
+            right: this.touchButtons.right.active,
+            jump: this.touchButtons.jump.active
+          };
         }
-        hideControls() {
-          const controls = document.getElementById("mobile-controls");
-          if (controls) {
-            controls.style.display = "none";
-          }
+        dispose() {
+          const container = document.getElementById("mobile-controls");
+          if (container) container.remove();
         }
       };
       __name(_MobileTouchControls, "MobileTouchControls");
-      var MobileTouchControls2 = _MobileTouchControls;
-      if (typeof module !== "undefined" && module.exports) {
-        module.exports = MobileTouchControls2;
-      } else {
-        window.MobileTouchControls = MobileTouchControls2;
+      MobileTouchControls = _MobileTouchControls;
+      if (typeof window !== "undefined") {
+        window.MobileTouchControls = MobileTouchControls;
       }
     }
   });
@@ -2051,16 +2070,512 @@
   __name(_LevelManager, "LevelManager");
   var LevelManager = _LevelManager;
 
+  // src/systems/ui/PauseMenu.js
+  var _PauseMenu = class _PauseMenu {
+    constructor() {
+      this.visible = false;
+      this.canvas = document.getElementById("game-canvas");
+      this.overlay = null;
+      this.buttons = {};
+      this.init();
+    }
+    init() {
+      this.createOverlay();
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && window.gameState?.running) {
+          e.preventDefault();
+          this.toggle();
+        }
+      });
+      console.log("\u{1F3AE} Pause menu initialized! (Press ESC to pause)");
+    }
+    createOverlay() {
+      const existing = document.getElementById("pause-overlay");
+      if (existing) existing.remove();
+      this.overlay = document.createElement("div");
+      this.overlay.id = "pause-overlay";
+      this.overlay.className = "hidden";
+      this.overlay.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(13, 13, 26, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.3s ease-out;
+    `;
+      const title = document.createElement("div");
+      title.textContent = "\u23F8\uFE0F PAUSED";
+      title.style.cssText = `
+      font-size: 48px;
+      font-weight: bold;
+      color: #00bcd4;
+      font-family: 'JetBrains Mono', monospace;
+      text-shadow: 0 0 20px rgba(0, 188, 212, 0.8);
+      margin-bottom: 40px;
+      animation: pulse 2s infinite;
+    `;
+      const stats = document.createElement("div");
+      stats.style.cssText = `
+      font-size: 18px;
+      color: #e0e0e0;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 40px;
+      text-align: center;
+      line-height: 2;
+    `;
+      stats.innerHTML = `
+      <div>Score: <strong id="pause-score">0</strong></div>
+      <div>Niveau: <strong id="pause-level">1</strong></div>
+      <div>Temps: <strong id="pause-timer">60</strong>s</div>
+    `;
+      const btnContainer = document.createElement("div");
+      btnContainer.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 300px;
+    `;
+      this.buttons.resume = this.createButton("\u25B6\uFE0F REPRENDRE", () => this.resume(), "#00bcd4");
+      this.buttons.restart = this.createButton("\u{1F504} RECOMMENCER", () => this.restart(), "#4CAF50");
+      this.buttons.quit = this.createButton("\u23F9\uFE0F MENU PRINCIPAL", () => this.quit(), "#F44336");
+      const controls = document.createElement("div");
+      controls.style.cssText = `
+      margin-top: 40px;
+      font-size: 14px;
+      color: #888;
+      font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      line-height: 1.6;
+    `;
+      controls.innerHTML = `
+      <div><strong>CONTROLS CLAVIER</strong></div>
+      <div>\u2190 \u2192 = Bouger</div>
+      <div>Espace = Sauter</div>
+      <div>D = Chuter rapide</div>
+      <div>ESC = Pause</div>
+    `;
+      this.overlay.appendChild(title);
+      this.overlay.appendChild(stats);
+      this.overlay.appendChild(btnContainer);
+      this.overlay.appendChild(controls);
+      const gameContainer = this.canvas.parentElement;
+      if (gameContainer) {
+        gameContainer.appendChild(this.overlay);
+      }
+    }
+    createButton(text, onClick, color) {
+      const btn = document.createElement("button");
+      btn.textContent = text;
+      btn.style.cssText = `
+      width: 100%;
+      padding: 15px 25px;
+      font-size: 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: bold;
+      color: #fff;
+      background: ${color};
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    `;
+      btn.onmouseover = () => {
+        btn.style.transform = "scale(1.05)";
+        btn.style.boxShadow = `0 6px 20px rgba(${this.hexToRgb(color)}, 0.5)`;
+      };
+      btn.onmouseout = () => {
+        btn.style.transform = "scale(1)";
+        btn.style.boxShadow = "0 4px 15px rgba(0,0,0,0.3)";
+      };
+      btn.onclick = (e) => {
+        e.preventDefault();
+        onClick();
+      };
+      return btn;
+    }
+    hexToRgb(hex) {
+      const bigint = parseInt(hex.slice(1), 16);
+      const r = bigint >> 16 & 255;
+      const g = bigint >> 8 & 255;
+      const b = bigint & 255;
+      return `${r},${g},${b}`;
+    }
+    toggle() {
+      if (this.visible) {
+        this.hide();
+      } else {
+        this.show();
+      }
+    }
+    show() {
+      if (this.overlay) {
+        this.overlay.classList.remove("hidden");
+        this.visible = true;
+        if (window.gameState) {
+          document.getElementById("pause-score").textContent = window.gameState.score;
+          document.getElementById("pause-level").textContent = window.gameState.level;
+          document.getElementById("pause-timer").textContent = window.gameState.timeLeft;
+        }
+        this.overlay.style.cursor = "default";
+        console.log("\u23F8\uFE0F Game paused");
+      }
+    }
+    hide() {
+      if (this.overlay) {
+        this.overlay.classList.add("hidden");
+        this.visible = false;
+        this.overlay.style.cursor = "default";
+        console.log("\u25B6\uFE0F Game resumed");
+      }
+    }
+    resume() {
+      this.hide();
+      if (window.gameState && !window.gameState.running) {
+        window.gameState.running = true;
+      }
+    }
+    restart() {
+      this.hide();
+      if (window.restartGame) {
+        window.restartGame();
+      } else {
+        console.error("\u274C restartGame not found");
+      }
+    }
+    quit() {
+      this.hide();
+      if (window.gameState) {
+        window.gameState.running = false;
+      }
+      document.getElementById("start-screen").classList.remove("hidden");
+      document.getElementById("game-over-screen").classList.add("hidden");
+      this.overlay.classList.add("hidden");
+      console.log("\u{1F3E0} Returned to main menu");
+    }
+    update() {
+      if (!this.visible) return;
+      if (window.gameState && window.gameState.timeLeft > 0) {
+        document.getElementById("pause-score").textContent = window.gameState.score;
+        document.getElementById("pause-timer").textContent = Math.ceil(window.gameState.timeLeft);
+      }
+    }
+    dispose() {
+      if (this.overlay) {
+        this.overlay.remove();
+      }
+    }
+  };
+  __name(_PauseMenu, "PauseMenu");
+  var PauseMenu = _PauseMenu;
+  if (typeof window !== "undefined") {
+    window.PauseMenu = PauseMenu;
+  }
+
+  // src/systems/AudioSystem.js
+  var _AudioSystem = class _AudioSystem {
+    constructor() {
+      this.enabled = false;
+      this.musicEnabled = true;
+      this.sfxEnabled = true;
+      this.masterVolume = 0.5;
+      this.musicVolume = 0.4;
+      this.sfxVolume = 0.6;
+      this.ctx = null;
+      this.currentMusic = null;
+      this.musicGain = null;
+      this.sounds = {
+        jump: null,
+        collect: null,
+        kill: null,
+        powerup: null,
+        boss: null,
+        win: null,
+        lose: null,
+        ui_click: null
+      };
+      this.synthSounds();
+    }
+    init() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioContext();
+        this.enabled = true;
+        if (this.ctx.state === "suspended") {
+          this.ctx.resume();
+        }
+        console.log("\u{1F3B5} Audio system initialized!");
+      } catch (e) {
+        console.warn("\u274C Audio not supported:", e);
+        this.enabled = false;
+      }
+    }
+    synthSounds() {
+      this.sounds.jump = () => {
+        if (!this.enabled || !this.sfxEnabled) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(440, this.ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3 * this.sfxVolume, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.2);
+      };
+      this.sounds.collect = () => {
+        if (!this.enabled || !this.sfxEnabled) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1800, this.ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.2 * this.sfxVolume, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.15);
+      };
+      this.sounds.kill = () => {
+        if (!this.enabled || !this.sfxEnabled) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3 * this.sfxVolume, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+      };
+      this.sounds.powerup = () => {
+        if (!this.enabled || !this.sfxEnabled) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.type = "square";
+        osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+        osc.frequency.setValueAtTime(554, this.ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(659, this.ctx.currentTime + 0.2);
+        osc.frequency.setValueAtTime(880, this.ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.25 * this.sfxVolume, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.5);
+      };
+      this.sounds.boss = () => {
+        if (!this.enabled || !this.sfxEnabled) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.type = "square";
+        osc.frequency.setValueAtTime(60, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.8);
+        osc.frequency.setValueAtTime(60, this.ctx.currentTime + 0.8);
+        osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 1.6);
+        gain.gain.setValueAtTime(0.4 * this.sfxVolume, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 2);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 2);
+      };
+      this.sounds.win = () => {
+        if (!this.enabled || !this.sfxEnabled) return;
+        const notes = [523, 659, 784, 1047, 784, 1047];
+        let time = this.ctx.currentTime;
+        notes.forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.frequency.setValueAtTime(freq, time);
+          gain.gain.setValueAtTime(0.25 * this.sfxVolume, time);
+          gain.gain.exponentialRampToValueAtTime(0.01, time + 0.4);
+          osc.start(time);
+          osc.stop(time + 0.4);
+          time += 0.3;
+        });
+      };
+      this.sounds.lose = () => {
+        if (!this.enabled || !this.sfxEnabled) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(220, this.ctx.currentTime + 1.5);
+        gain.gain.setValueAtTime(0.3 * this.sfxVolume, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 1.5);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 1.5);
+      };
+      this.sounds.ui_click = () => {
+        if (!this.enabled || !this.sfxEnabled) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.1 * this.sfxVolume, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.05);
+      };
+    }
+    playSound(soundName) {
+      if (this.sounds[soundName]) {
+        this.sounds[soundName]();
+      }
+    }
+    playMusic() {
+      if (!this.musicEnabled || !this.enabled) return;
+      if (this.currentMusic) {
+        this.fadeOutMusic(() => {
+          this.startMusicLoop();
+        });
+      } else {
+        this.startMusicLoop();
+      }
+    }
+    startMusicLoop() {
+      this.currentMusic = {
+        notes: [
+          [110, 121, 130, 146, 164, 174, 196, 220],
+          // C2 -> C3
+          [146, 155, 164, 185, 207, 220, 246, 276],
+          // D2 -> D3
+          [87, 115, 155, 174, 196, 232, 261, 293]
+          // A1 -> E3
+        ],
+        index: 0,
+        timeout: null,
+        gain: null,
+        master: this.ctx.createGain()
+      };
+      this.currentMusic.master.connect(this.ctx.destination);
+      this.musicGain = this.ctx.createGain();
+      this.musicGain.gain.value = this.musicVolume;
+      this.currentMusic.master.connect(this.musicGain);
+      this.musicGain.connect(this.ctx.destination);
+      this.playNextMusicNote();
+    }
+    playNextMusicNote() {
+      if (!this.currentMusic || !this.musicEnabled) return;
+      const now = this.ctx.currentTime;
+      const loop = this.currentMusic;
+      const noteData = loop.notes[loop.index % loop.notes.length];
+      const bassFreq = noteData[0];
+      const bass = this.ctx.createOscillator();
+      const bassGain = this.ctx.createGain();
+      bass.type = "sawtooth";
+      bass.frequency.setValueAtTime(bassFreq, now);
+      bassGain.gain.setValueAtTime(0.15 * this.musicVolume, now);
+      bassGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+      bass.connect(bassGain);
+      bassGain.connect(this.currentMusic.master);
+      bass.start(now);
+      bass.stop(now + 0.5);
+      noteData.forEach((freq, i) => {
+        const note = this.ctx.createOscillator();
+        const noteGain = this.ctx.createGain();
+        note.type = "sine";
+        note.frequency.setValueAtTime(freq, now + i * 0.1);
+        noteGain.gain.setValueAtTime(0.1 * this.musicVolume, now + i * 0.1);
+        noteGain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.3);
+        note.connect(noteGain);
+        noteGain.connect(this.currentMusic.master);
+        note.start(now + i * 0.1);
+        note.stop(now + i * 0.1 + 0.3);
+      });
+      loop.timeout = setTimeout(() => {
+        loop.index++;
+        this.playNextMusicNote();
+      }, 500);
+    }
+    stopMusic() {
+      if (this.currentMusic) {
+        if (this.currentMusic.timeout) {
+          clearTimeout(this.currentMusic.timeout);
+        }
+        this.currentMusic = null;
+      }
+    }
+    fadeOutMusic(onComplete) {
+      if (!this.musicGain) return;
+      const now = this.ctx.currentTime;
+      const duration = 0.5;
+      this.musicGain.gain.setValueAtTime(this.musicGain.gain.value, now);
+      this.musicGain.gain.exponentialRampToValueAtTime(1e-3, now + duration);
+      setTimeout(onComplete, duration * 1e3);
+    }
+    toggleMusic() {
+      this.musicEnabled = !this.musicEnabled;
+      if (this.musicEnabled) {
+        this.playMusic();
+      } else {
+        this.stopMusic();
+      }
+      return this.musicEnabled;
+    }
+    toggleSFX() {
+      this.sfxEnabled = !this.sfxEnabled;
+      return this.sfxEnabled;
+    }
+    setMasterVolume(vol) {
+      this.masterVolume = Math.max(0, Math.min(1, vol));
+      if (this.currentMusic) {
+        this.currentMusic.master.gain.value = this.musicVolume;
+      }
+      this.sfxVolume = this.masterVolume * 0.7;
+    }
+    toggleAll() {
+      const nowEnabled = !this.enabled;
+      if (nowEnabled) {
+        this.init();
+      } else {
+        if (this.ctx) {
+          this.ctx.close();
+          this.ctx = null;
+        }
+      }
+      return nowEnabled;
+    }
+    dispose() {
+      this.stopMusic();
+      if (this.ctx) {
+        this.ctx.close();
+        this.ctx = null;
+      }
+    }
+  };
+  __name(_AudioSystem, "AudioSystem");
+  var AudioSystem = _AudioSystem;
+  if (typeof window !== "undefined") {
+    window.AudioSystem = AudioSystem;
+  }
+
   // game.js
   if (typeof window !== "undefined") {
     window.__NEON_PROTOCOL_GLOBALS__ = {};
   }
-  var MobileTouchControls = null;
+  var MobileTouchControls2 = null;
   if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-    Promise.resolve().then(() => __toESM(require_mobile_controls())).then((mod) => {
-      MobileTouchControls = mod.MobileTouchControls;
-      if (MobileTouchControls) {
-        new MobileTouchControls();
+    Promise.resolve().then(() => (init_mobile_controls_complete(), mobile_controls_complete_exports)).then((mod) => {
+      MobileTouchControls2 = mod.MobileTouchControls;
+      if (MobileTouchControls2) {
+        const mobile = new MobileTouchControls2();
       }
     }).catch(() => console.log("Mobile controls not available"));
   }
@@ -2080,12 +2595,14 @@
   var transitions = new TransitionSystem();
   var leaderboard = new LeaderboardSystem();
   var achievements = new AchievementSystem(leaderboard);
-  var particles = new ParticleSystem2();
   var combo = new ComboSystem();
+  var audio = new AudioSystem();
+  var pauseMenu = new PauseMenu();
+  var particles = new ParticleSystem2();
   var powerUps = new PowerUpSystem();
   var menu = new MenuSystem();
   var levelManager = new LevelManager();
-  var gameState2 = {
+  var gameState = {
     running: false,
     score: 0,
     level: 1,
@@ -2126,6 +2643,13 @@
       e.preventDefault();
     }
     if (e.code === "Escape") {
+      pauseMenu.toggle();
+    }
+    if (e.code === "KeyM") {
+      audio.toggleAll();
+    }
+    if (e.code === "KeyR") {
+      if (window.restartGame) window.restartGame();
     }
   });
   document.addEventListener("keyup", (e) => keys2[e.code] = false);
@@ -2148,11 +2672,11 @@
   }
   __name(initLevel, "initLevel");
   function loadLevel(levelNum) {
-    gameState2.level = levelNum;
-    gameState2.timeLeft = 60 + (levelNum - 1) * 10;
-    gameState2.running = true;
-    gameState2.lastTime = performance.now();
-    gameState2.score = 0;
+    gameState.level = levelNum;
+    gameState.timeLeft = 60 + (levelNum - 1) * 10;
+    gameState.running = true;
+    gameState.lastTime = performance.now();
+    gameState.score = 0;
     player.x = 100;
     player.y = 300;
     player.health = 100;
@@ -2162,27 +2686,27 @@
     player.speedBoost = false;
     player.invisible = false;
     levelManager.loadLevel(levelNum);
-    gameState2.platforms = levelManager.platforms;
-    gameState2.enemies = levelManager.enemies;
-    gameState2.coins = levelManager.coins;
-    gameState2.powerUpsList = levelManager.powerups;
-    gameState2.bosses = levelManager.getBosses();
+    gameState.platforms = levelManager.platforms;
+    gameState.enemies = levelManager.enemies;
+    gameState.coins = levelManager.coins;
+    gameState.powerUpsList = levelManager.powerups;
+    gameState.bosses = levelManager.getBosses();
     updateScore();
-    document.getElementById("level").textContent = gameState2.level;
+    document.getElementById("level").textContent = gameState.level;
     document.getElementById("score-board").classList.remove("hidden");
     document.getElementById("level-info").classList.remove("hidden");
     document.getElementById("timer").classList.remove("hidden");
     document.getElementById("controls-hint").classList.remove("hidden");
     document.getElementById("health-bar").classList.remove("hidden");
-    if (gameState2.level > 1) {
-      transitions.startTransition("levelUp", `NIVEAU ${gameState2.level} COMMENC\xC9!`);
+    if (gameState.level > 1) {
+      transitions.startTransition("levelUp", `NIVEAU ${gameState.level} COMMENC\xC9!`);
     }
   }
   __name(loadLevel, "loadLevel");
   function gameLoop(timestamp) {
-    if (!gameState2.running) return;
-    const deltaTime = timestamp - gameState2.lastTime;
-    gameState2.lastTime = timestamp;
+    if (!gameState.running) return;
+    const deltaTime = timestamp - gameState.lastTime;
+    gameState.lastTime = timestamp;
     update(deltaTime);
     render();
     requestAnimationFrame(gameLoop);
@@ -2215,7 +2739,7 @@
     if (player.x < 0) player.x = 0;
     if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
     player.grounded = false;
-    for (const plat of gameState2.platforms) {
+    for (const plat of gameState.platforms) {
       if (player.y + player.height >= plat.y && player.y + player.height <= plat.y + player.vy + player.gravity + 5 && player.x + player.width > plat.x && player.x < plat.x + plat.width && plat.type === "ground") {
         player.y = plat.y - player.height;
         player.vy = 0;
@@ -2224,7 +2748,7 @@
       }
     }
     if (!player.grounded) {
-      for (const plat of gameState2.platforms) {
+      for (const plat of gameState.platforms) {
         if (plat.type === "platform") {
           if (player.vy > 0 && player.y + player.height >= plat.y && player.y + player.height <= plat.y + player.vy + 10 && player.x + player.width > plat.x && player.x < plat.x + plat.width) {
             player.y = plat.y - player.height;
@@ -2244,10 +2768,10 @@
     updateEnemies();
     updateCoins();
     updatePowerUps();
-    gameState2.timeLeft -= deltaTime / 1e3;
-    if (gameState2.timeLeft < 0) gameState2.timeLeft = 0;
-    const minutes = Math.floor(gameState2.timeLeft / 60);
-    const seconds = Math.floor(gameState2.timeLeft % 60);
+    gameState.timeLeft -= deltaTime / 1e3;
+    if (gameState.timeLeft < 0) gameState.timeLeft = 0;
+    const minutes = Math.floor(gameState.timeLeft / 60);
+    const seconds = Math.floor(gameState.timeLeft % 60);
     document.getElementById("timer").textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     const healthFill = document.getElementById("health-fill");
     if (healthFill) healthFill.style.width = Math.max(0, player.health) + "%";
@@ -2256,7 +2780,7 @@
     combo.update(deltaTime);
     if (player.health <= 0) {
       gameOver(false);
-    } else if (gameState2.timeLeft <= 0 && gameState2.bosses.length === 0) {
+    } else if (gameState.timeLeft <= 0 && gameState.bosses.length === 0) {
       gameOver(true);
     }
     if (player.shielded && player.shieldDuration > 0) {
@@ -2280,12 +2804,12 @@
   }
   __name(update, "update");
   function updateEnemies() {
-    if (gameState2.enemies.length === 0 && gameState2.bosses.length === 0 && gameState2.timeLeft <= 0) {
+    if (gameState.enemies.length === 0 && gameState.bosses.length === 0 && gameState.timeLeft <= 0) {
       gameOver(true);
       return;
     }
-    for (let i = gameState2.enemies.length - 1; i >= 0; i--) {
-      const enemy = gameState2.enemies[i];
+    for (let i = gameState.enemies.length - 1; i >= 0; i--) {
+      const enemy = gameState.enemies[i];
       switch (enemy.type) {
         case "walker":
           enemy.x += enemy.vx;
@@ -2326,8 +2850,8 @@
   }
   __name(updateEnemies, "updateEnemies");
   function updateCoins() {
-    for (let i = gameState2.coins.length - 1; i >= 0; i--) {
-      const coin = gameState2.coins[i];
+    for (let i = gameState.coins.length - 1; i >= 0; i--) {
+      const coin = gameState.coins[i];
       if (coin.collected) continue;
       const dx = player.x + player.width / 2 - coin.x;
       const dy = player.y + player.height / 2 - coin.y;
@@ -2336,9 +2860,9 @@
         coin.collected = true;
         const value = coin.value || 10;
         const scored = combo.coinCollected(value);
-        gameState2.score += scored;
+        gameState.score += scored;
         achievements.updateStats("coinsCollected");
-        leaderboard.data.levels[gameState2.level].coinsCollected = (leaderboard.data.levels[gameState2.level].coinsCollected || 0) + 1;
+        leaderboard.data.levels[gameState.level].coinsCollected = (leaderboard.data.levels[gameState.level].coinsCollected || 0) + 1;
         particles.collectCoin(coin.x, coin.y);
         updateScore();
       }
@@ -2346,8 +2870,8 @@
   }
   __name(updateCoins, "updateCoins");
   function updatePowerUps() {
-    for (let i = gameState2.powerUpsList.length - 1; i >= 0; i--) {
-      const pu = gameState2.powerUpsList[i];
+    for (let i = gameState.powerUpsList.length - 1; i >= 0; i--) {
+      const pu = gameState.powerUpsList[i];
       if (pu.collected) continue;
       const dx = player.x + player.width / 2 - pu.x;
       const dy = player.y + player.height / 2 - pu.y;
@@ -2370,7 +2894,7 @@
             player.speedBoostDuration = 20 * 60;
             break;
           case "freeze":
-            gameState2.enemies.forEach((e) => e.speed *= 0.5);
+            gameState.enemies.forEach((e) => e.speed *= 0.5);
             break;
           case "timeStop":
             achievements.updateStats("timeStopsUsed");
@@ -2390,7 +2914,7 @@
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     levelManager.render(ctx);
-    for (const coin of gameState2.coins) {
+    for (const coin of gameState.coins) {
       if (coin.collected) continue;
       ctx.beginPath();
       ctx.arc(coin.x, coin.y, coin.size, 0, Math.PI * 2);
@@ -2401,7 +2925,7 @@
       ctx.stroke();
       ctx.closePath();
     }
-    for (const enemy of gameState2.enemies) {
+    for (const enemy of gameState.enemies) {
       ctx.fillStyle = getEnemyColor(enemy.type);
       ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
       ctx.fillStyle = "white";
@@ -2415,7 +2939,7 @@
       ctx.arc(enemy.x + 30, enemy.y + 15, 2, 0, Math.PI * 2);
       ctx.fill();
     }
-    for (const boss of gameState2.bosses) {
+    for (const boss of gameState.bosses) {
       ctx.fillStyle = "#E91E63";
       ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
       const healthPercent = boss.health / boss.maxHealth;
@@ -2466,8 +2990,8 @@
   }
   __name(checkCollision, "checkCollision");
   function updateScore() {
-    document.getElementById("score").textContent = gameState2.score;
-    leaderboard.data.global.highest = Math.max(leaderboard.data.global.highest, gameState2.score);
+    document.getElementById("score").textContent = gameState.score;
+    leaderboard.data.global.highest = Math.max(leaderboard.data.global.highest, gameState.score);
     leaderboard.save();
   }
   __name(updateScore, "updateScore");
@@ -2481,24 +3005,24 @@
   }
   __name(startGame, "startGame");
   function gameOver(won) {
-    gameState2.running = false;
-    leaderboard.submitScore(gameState2.level, gameState2.score);
-    achievements.updateStats("timeSurvived", Math.floor(gameState2.timeLeft));
-    if (won && gameState2.level < 5) {
-      transitions.startTransition("levelUp", `NIVEAU ${gameState2.level} TERMIN\xC9!`);
+    gameState.running = false;
+    leaderboard.submitScore(gameState.level, gameState.score);
+    achievements.updateStats("timeSurvived", Math.floor(gameState.timeLeft));
+    if (won && gameState.level < 5) {
+      transitions.startTransition("levelUp", `NIVEAU ${gameState.level} TERMIN\xC9!`);
       setTimeout(() => {
         startNextLevel();
       }, 2e3);
       return;
-    } else if (won && gameState2.level === 5) {
-      leaderboard.submitScore(0, gameState2.score);
+    } else if (won && gameState.level === 5) {
+      leaderboard.submitScore(0, gameState.score);
       transitions.startTransition("victory", "\u{1F389} VICTOIRE TOTALE! \u{1F389}");
       particles.levelUp(canvas.width / 2, canvas.height / 2);
       setTimeout(() => {
         document.getElementById("game-over-screen").classList.remove("hidden");
         document.getElementById("game-over-title").textContent = "\u{1F389} Victoire Totale !";
         document.getElementById("game-over-title").style.color = "#FFD700";
-        document.getElementById("game-over-message").textContent = `Score final: ${gameState2.score} - F\xC9LICITIONS! Vous avez termin\xE9 tous les niveaux!`;
+        document.getElementById("game-over-message").textContent = `Score final: ${gameState.score} - F\xC9LICITIONS! Vous avez termin\xE9 tous les niveaux!`;
       }, 2e3);
       return;
     } else {
@@ -2507,14 +3031,14 @@
         document.getElementById("game-over-screen").classList.remove("hidden");
         document.getElementById("game-over-title").textContent = "\u{1F480} Game Over";
         document.getElementById("game-over-title").style.color = "#FF6B6B";
-        document.getElementById("game-over-message").textContent = `Score final: ${gameState2.score} - Vous avez \xE9t\xE9 \xE9limin\xE9 !`;
+        document.getElementById("game-over-message").textContent = `Score final: ${gameState.score} - Vous avez \xE9t\xE9 \xE9limin\xE9 !`;
       }, 1e3);
       return;
     }
   }
   __name(gameOver, "gameOver");
   function startNextLevel() {
-    loadLevel(gameState2.level + 1);
+    loadLevel(gameState.level + 1);
   }
   __name(startNextLevel, "startNextLevel");
   function restartGame() {
@@ -2522,8 +3046,8 @@
     document.getElementById("start-screen").classList.remove("hidden");
     document.getElementById("game-over-screen").classList.add("hidden");
     document.getElementById("menu-overlay")?.classList.add("hidden");
-    gameState2.score = 0;
-    gameState2.timeLeft = 60;
+    gameState.score = 0;
+    gameState.timeLeft = 60;
     loadLevel(1);
     requestAnimationFrame(gameLoop);
   }
@@ -2540,7 +3064,6 @@
     }
     console.log("NEON PROTOCOL v5.3 ready!");
   })();
-})(
 
   if (typeof window !== 'undefined') {
     window.startGame = window.startGame || startGame;
@@ -2548,5 +3071,5 @@
     window.startNextLevel = window.startNextLevel || startNextLevel;
     window.initLevel = window.initLevel || initLevel;
   }
-  console.log('NEON PROTOCOL v5.3 - ALL FUNCTIONS EXPOSED!');
+  console.log('NEON PROTOCOL v5.4 - All systems loaded!');
 });

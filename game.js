@@ -14,16 +14,18 @@ import ComboSystem from './src/systems/ComboSystem.js';
 import { PowerUpSystem } from './src/systems/PowerUpSystem.js';
 import MenuSystem from './src/systems/ui/MenuSystem.js';
 import LevelManager from './src/levels/LevelManager.js';
+import { PauseMenu } from './src/systems/ui/PauseMenu.js';
+import { AudioSystem } from './src/systems/AudioSystem.js';
 import Boss from './src/entities/Boss.js';
 // Mobile touch controls will be loaded dynamically
 let MobileTouchControls = null;
 
 // Load mobile controls if on mobile device
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-  import('./src/mobile/mobile-controls.js').then(mod => {
+  import('./src/mobile/mobile-controls-complete.js').then(mod => {
     MobileTouchControls = mod.MobileTouchControls;
     if (MobileTouchControls) {
-      new MobileTouchControls();
+      const mobile = new MobileTouchControls();
     }
   }).catch(() => console.log('Mobile controls not available'));
 }
@@ -48,8 +50,10 @@ const ctx = canvas.getContext('2d');
 const transitions = new TransitionSystem();
 const leaderboard = new LeaderboardSystem();
 const achievements = new AchievementSystem(leaderboard);
-const particles = new ParticleSystem2();
 const combo = new ComboSystem();
+const audio = new AudioSystem();
+const pauseMenu = new PauseMenu();
+const particles = new ParticleSystem2();
 const powerUps = new PowerUpSystem();
 const menu = new MenuSystem();
 const levelManager = new LevelManager();
@@ -99,9 +103,14 @@ document.addEventListener('keydown', (e) => {
   if (keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight'] || keys['Space']) {
     e.preventDefault();
   }
-  // Keyboard shortcuts
   if (e.code === 'Escape') {
-    // Quit/Menu logic
+    pauseMenu.toggle();
+  }
+  if (e.code === 'KeyM') {
+    audio.toggleAll();
+  }
+  if (e.code === 'KeyR') {
+    if (window.restartGame) window.restartGame();
   }
 });
 document.addEventListener('keyup', (e) => keys[e.code] = false);

@@ -1,85 +1,377 @@
-// 🎮 Audio System
-// Sound effects and music (optional)
+// 🎵 NEON PROTOCOL - AUDIO SYSTEM
+// Background music, SFX, Volume control, Mute toggle
 
-export default class AudioSystem {
+class AudioSystem {
   constructor() {
-    this.enabled = true;
+    this.enabled = false;
+    this.musicEnabled = true;
+    this.sfxEnabled = true;
+    this.masterVolume = 0.5;
+    this.musicVolume = 0.4;
+    this.sfxVolume = 0.6;
+    
+    this.ctx = null;
+    this.currentMusic = null;
+    this.musicGain = null;
+    
     this.sounds = {
       jump: null,
       collect: null,
-      hurt: null,
-      gameOver: null,
-      win: null
+      kill: null,
+      powerup: null,
+      boss: null,
+      win: null,
+      lose: null,
+      ui_click: null
     };
-    this.musicTrack = null;
+    
+    // Synthesize sounds (no external assets needed)
+    this.synthSounds();
   }
   
-  // Initialize audio context (user interaction required first)
   init() {
     try {
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      console.log('Audio initialized');
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioContext();
+      this.enabled = true;
+      
+      // Resume context if suspended (browsers require user interaction)
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+      
+      console.log('🎵 Audio system initialized!');
     } catch (e) {
-      console.warn('Audio not supported:', e);
+      console.warn('❌ Audio not supported:', e);
       this.enabled = false;
     }
   }
   
-  // Play simple beep sound
-  playTone(freq, duration, type = 'square') {
-    if (!this.enabled || !this.audioContext) return;
+  synthSounds() {
+    // Synthesize all sound effects without external files
     
-    const osc = this.audioContext.createOscillator();
-    const gain = this.audioContext.createGain();
+    // JUMP sound
+    this.sounds.jump = () => {
+      if (!this.enabled || !this.sfxEnabled) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(440, this.ctx.currentTime + 0.15);
+      
+      gain.gain.setValueAtTime(0.3 * this.sfxVolume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.2);
+    };
     
-    osc.connect(gain);
-    gain.connect(this.audioContext.destination);
+    // COLLECT coin sound
+    this.sounds.collect = () => {
+      if (!this.enabled || !this.sfxEnabled) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1800, this.ctx.currentTime + 0.1);
+      
+      gain.gain.setValueAtTime(0.2 * this.sfxVolume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.15);
+    };
     
-    osc.type = type;
-    osc.frequency.value = freq;
+    // KILL enemy sound
+    this.sounds.kill = () => {
+      if (!this.enabled || !this.sfxEnabled) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 0.3);
+      
+      gain.gain.setValueAtTime(0.3 * this.sfxVolume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.3);
+    };
     
-    gain.gain.setValueAtTime(0.1, this.audioContext.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+    // POWERUP sound
+    this.sounds.powerup = () => {
+      if (!this.enabled || !this.sfxEnabled) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+      osc.frequency.setValueAtTime(554, this.ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(659, this.ctx.currentTime + 0.2);
+      osc.frequency.setValueAtTime(880, this.ctx.currentTime + 0.3);
+      
+      gain.gain.setValueAtTime(0.25 * this.sfxVolume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.5);
+    };
     
-    osc.start(this.audioContext.currentTime);
-    osc.stop(this.audioContext.currentTime + duration);
+    // BOSS fight sound
+    this.sounds.boss = () => {
+      if (!this.enabled || !this.sfxEnabled) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(60, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.8);
+      osc.frequency.setValueAtTime(60, this.ctx.currentTime + 0.8);
+      osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 1.6);
+      
+      gain.gain.setValueAtTime(0.4 * this.sfxVolume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 2);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 2);
+    };
+    
+    // WIN/Victory sound
+    this.sounds.win = () => {
+      if (!this.enabled || !this.sfxEnabled) return;
+      const notes = [523, 659, 784, 1047, 784, 1047];
+      let time = this.ctx.currentTime;
+      
+      notes.forEach((freq, i) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.frequency.setValueAtTime(freq, time);
+        
+        gain.gain.setValueAtTime(0.25 * this.sfxVolume, time);
+        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.4);
+        
+        osc.start(time);
+        osc.stop(time + 0.4);
+        time += 0.3;
+      });
+    };
+    
+    // LOSE/Game Over sound
+    this.sounds.lose = () => {
+      if (!this.enabled || !this.sfxEnabled) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(220, this.ctx.currentTime + 1.5);
+      
+      gain.gain.setValueAtTime(0.3 * this.sfxVolume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 1.5);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 1.5);
+    };
+    
+    // UI Click sound
+    this.sounds.ui_click = () => {
+      if (!this.enabled || !this.sfxEnabled) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+      
+      gain.gain.setValueAtTime(0.1 * this.sfxVolume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.05);
+    };
   }
   
-  // Jump sound
-  playJump() {
-    this.playTone(400, 0.1, 'square');
+  playSound(soundName) {
+    if (this.sounds[soundName]) {
+      this.sounds[soundName]();
+    }
   }
   
-  // Coin collect sound
-  playCollect() {
-    this.playTone(1200, 0.1, 'sine');
-    setTimeout(() => this.playTone(1600, 0.1, 'sine'), 50);
+  playMusic() {
+    if (!this.musicEnabled || !this.enabled) return;
+    
+    if (this.currentMusic) {
+      this.fadeOutMusic(() => {
+        this.startMusicLoop();
+      });
+    } else {
+      this.startMusicLoop();
+    }
   }
   
-  // Hurt sound
-  playHurt() {
-    this.playTone(200, 0.2, 'sawtooth');
+  startMusicLoop() {
+    // Simple cyberpunk background loop (synthesized)
+    this.currentMusic = {
+      notes: [
+        [110, 121, 130, 146, 164, 174, 196, 220], // C2 -> C3
+        [146, 155, 164, 185, 207, 220, 246, 276], // D2 -> D3
+        [87, 115, 155, 174, 196, 232, 261, 293]   // A1 -> E3
+      ],
+      index: 0,
+      timeout: null,
+      gain: null,
+      master: this.ctx.createGain()
+    };
+    
+    this.currentMusic.master.connect(this.ctx.destination);
+    this.musicGain = this.ctx.createGain();
+    this.musicGain.gain.value = this.musicVolume;
+    this.currentMusic.master.connect(this.musicGain);
+    this.musicGain.connect(this.ctx.destination);
+    
+    this.playNextMusicNote();
   }
   
-  // Game over sound
-  playGameOver() {
-    this.playTone(300, 0.3, 'sawtooth');
-    setTimeout(() => this.playTone(250, 0.3, 'sawtooth'), 200);
-    setTimeout(() => this.playTone(200, 0.5, 'sawtooth'), 400);
-  }
-  
-  // Victory sound
-  playWin() {
-    [523, 659, 784, 1047].forEach((freq, i) => {
-      setTimeout(() => this.playTone(freq, 0.2, 'square'), i * 150);
+  playNextMusicNote() {
+    if (!this.currentMusic || !this.musicEnabled) return;
+    
+    const now = this.ctx.currentTime;
+    const loop = this.currentMusic;
+    const noteData = loop.notes[loop.index % loop.notes.length];
+    
+    // Create bass line
+    const bassFreq = noteData[0];
+    const bass = this.ctx.createOscillator();
+    const bassGain = this.ctx.createGain();
+    
+    bass.type = 'sawtooth';
+    bass.frequency.setValueAtTime(bassFreq, now);
+    bassGain.gain.setValueAtTime(0.15 * this.musicVolume, now);
+    bassGain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+    
+    bass.connect(bassGain);
+    bassGain.connect(this.currentMusic.master);
+    bass.start(now);
+    bass.stop(now + 0.5);
+    
+    // Create arpeggio
+    noteData.forEach((freq, i) => {
+      const note = this.ctx.createOscillator();
+      const noteGain = this.ctx.createGain();
+      
+      note.type = 'sine';
+      note.frequency.setValueAtTime(freq, now + i * 0.1);
+      noteGain.gain.setValueAtTime(0.1 * this.musicVolume, now + i * 0.1);
+      noteGain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.3);
+      
+      note.connect(noteGain);
+      noteGain.connect(this.currentMusic.master);
+      note.start(now + i * 0.1);
+      note.stop(now + i * 0.1 + 0.3);
     });
+    
+    // Schedule next note
+    loop.timeout = setTimeout(() => {
+      loop.index++;
+      this.playNextMusicNote();
+    }, 500);
   }
   
-  // Toggle audio
-  toggle() {
-    this.enabled = !this.enabled;
-    if (this.enabled && this.audioContext?.state === 'suspended') {
-      this.audioContext.resume();
+  stopMusic() {
+    if (this.currentMusic) {
+      if (this.currentMusic.timeout) {
+        clearTimeout(this.currentMusic.timeout);
+      }
+      this.currentMusic = null;
+    }
+  }
+  
+  fadeOutMusic(onComplete) {
+    if (!this.musicGain) return;
+    
+    const now = this.ctx.currentTime;
+    const duration = 0.5;
+    
+    this.musicGain.gain.setValueAtTime(this.musicGain.gain.value, now);
+    this.musicGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+    
+    setTimeout(onComplete, duration * 1000);
+  }
+  
+  toggleMusic() {
+    this.musicEnabled = !this.musicEnabled;
+    if (this.musicEnabled) {
+      this.playMusic();
+    } else {
+      this.stopMusic();
+    }
+    return this.musicEnabled;
+  }
+  
+  toggleSFX() {
+    this.sfxEnabled = !this.sfxEnabled;
+    return this.sfxEnabled;
+  }
+  
+  setMasterVolume(vol) {
+    this.masterVolume = Math.max(0, Math.min(1, vol));
+    if (this.currentMusic) {
+      this.currentMusic.master.gain.value = this.musicVolume;
+    }
+    this.sfxVolume = this.masterVolume * 0.7; // SFX slightly quieter
+  }
+  
+  toggleAll() {
+    const nowEnabled = !this.enabled;
+    
+    if (nowEnabled) {
+      this.init();
+    } else {
+      if (this.ctx) {
+        this.ctx.close();
+        this.ctx = null;
+      }
+    }
+    
+    return nowEnabled;
+  }
+  
+  dispose() {
+    this.stopMusic();
+    if (this.ctx) {
+      this.ctx.close();
+      this.ctx = null;
     }
   }
 }
+
+// Export
+if (typeof window !== 'undefined') {
+  window.AudioSystem = AudioSystem;
+}
+
+export { AudioSystem };
