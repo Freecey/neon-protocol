@@ -15,13 +15,10 @@
   __export(mobile_controls_complete_exports, {
     MobileTouchControls: () => MobileTouchControls
   });
-  var MobileTouchControls;
+  var _MobileTouchControls, MobileTouchControls;
   var init_mobile_controls_complete = __esm({
     "src/mobile/mobile-controls-complete.js"() {
-      MobileTouchControls = class {
-        static {
-          __name(this, "MobileTouchControls");
-        }
+      _MobileTouchControls = class _MobileTouchControls {
         constructor() {
           this.enabled = navigator.maxTouchPoints > 0;
           if (!this.enabled) {
@@ -251,6 +248,8 @@
           if (container) container.remove();
         }
       };
+      __name(_MobileTouchControls, "MobileTouchControls");
+      MobileTouchControls = _MobileTouchControls;
       if (typeof window !== "undefined") {
         window.MobileTouchControls = MobileTouchControls;
       }
@@ -258,10 +257,7 @@
   });
 
   // src/systems/TransitionSystem.js
-  var TransitionSystem = class {
-    static {
-      __name(this, "TransitionSystem");
-    }
+  var _TransitionSystem = class _TransitionSystem {
     constructor() {
       this.state = "idle";
       this.alpha = 0;
@@ -437,12 +433,11 @@
       this.text = "";
     }
   };
+  __name(_TransitionSystem, "TransitionSystem");
+  var TransitionSystem = _TransitionSystem;
 
   // src/systems/LeaderboardSystem.js
-  var LeaderboardSystem = class {
-    static {
-      __name(this, "LeaderboardSystem");
-    }
+  var _LeaderboardSystem = class _LeaderboardSystem {
     constructor() {
       this.data = this.load();
       this.recentScores = [];
@@ -471,7 +466,30 @@
       };
     }
     save() {
-      localStorage.setItem("neon-protocol-leaderboard", JSON.stringify(this.data));
+      try {
+        localStorage.setItem("neon-protocol-leaderboard", JSON.stringify(this.data));
+      } catch (error) {
+        console.warn("\u26A0\uFE0F localStorage write failed:", error.message);
+        if (error.name === "QuotaExceededError") {
+          this.handleQuotaExceeded();
+        }
+      }
+    }
+    handleQuotaExceeded() {
+      console.log("\u{1F9F9} Cleaning old localStorage data...");
+      localStorage.removeItem("neon-protocol-leaderboard");
+      const minimalData = {
+        global: { highest: this.data.global.highest },
+        levels: Object.fromEntries(
+          Object.entries(this.data.levels).slice(0, 3)
+        )
+      };
+      try {
+        localStorage.setItem("neon-protocol-leaderboard", JSON.stringify(minimalData));
+        this.data = minimalData;
+      } catch (e) {
+        console.error("\u274C Cannot save after cleanup, discarding changes");
+      }
     }
     submitScore(level, score, timestamp = Date.now()) {
       const newScore = { level, score, timestamp, date: (/* @__PURE__ */ new Date()).toLocaleDateString("fr-FR") };
@@ -528,12 +546,11 @@
       this.recentScores = [];
     }
   };
+  __name(_LeaderboardSystem, "LeaderboardSystem");
+  var LeaderboardSystem = _LeaderboardSystem;
 
   // src/systems/AchievementSystem.js
-  var AchievementSystem = class {
-    static {
-      __name(this, "AchievementSystem");
-    }
+  var _AchievementSystem = class _AchievementSystem {
     constructor(leaderboard2) {
       this.leaderboard = leaderboard2;
       this.achievements = this.load();
@@ -570,7 +587,25 @@
       ];
     }
     save() {
-      localStorage.setItem("neon-protocol-achievements", JSON.stringify(this.achievements));
+      try {
+        localStorage.setItem("neon-protocol-achievements", JSON.stringify(this.achievements));
+      } catch (error) {
+        console.warn("\u26A0\uFE0F localStorage write failed:", error.message);
+        if (error.name === "QuotaExceededError") {
+          this.handleQuotaExceeded();
+        }
+      }
+    }
+    handleQuotaExceeded() {
+      console.log("\u{1F9F9} Cleaning old localStorage data...");
+      localStorage.removeItem("neon-protocol-achievements");
+      const minimalData = this.achievements.filter((a) => a.unlocked);
+      try {
+        localStorage.setItem("neon-protocol-achievements", JSON.stringify(minimalData));
+        this.achievements = minimalData;
+      } catch (e) {
+        console.error("\u274C Cannot save after cleanup, discarding changes");
+      }
     }
     updateStats(what, amount = 1) {
       if (this.stats.hasOwnProperty(what)) {
@@ -648,12 +683,11 @@
       this.achievements = this.load();
     }
   };
+  __name(_AchievementSystem, "AchievementSystem");
+  var AchievementSystem = _AchievementSystem;
 
   // src/systems/ParticleSystem2.js
-  var ParticleSystem2 = class {
-    static {
-      __name(this, "ParticleSystem2");
-    }
+  var _ParticleSystem2 = class _ParticleSystem2 {
     constructor() {
       this.particles = [];
       this.maxParticles = 200;
@@ -1053,12 +1087,11 @@
       this.particles = [];
     }
   };
+  __name(_ParticleSystem2, "ParticleSystem2");
+  var ParticleSystem2 = _ParticleSystem2;
 
   // src/systems/ComboSystem.js
-  var ComboSystem = class {
-    static {
-      __name(this, "ComboSystem");
-    }
+  var _ComboSystem = class _ComboSystem {
     constructor() {
       this.comboCount = 0;
       this.comboTime = 0;
@@ -1111,12 +1144,11 @@
       return `${this.comboMultiplier}x <span style="color:${color}">${this.comboCount}</span>`;
     }
   };
+  __name(_ComboSystem, "ComboSystem");
+  var ComboSystem = _ComboSystem;
 
   // src/systems/PowerUpSystem.js
-  var PowerUpSystem = class {
-    static {
-      __name(this, "PowerUpSystem");
-    }
+  var _PowerUpSystem = class _PowerUpSystem {
     constructor() {
       this.particles = [];
     }
@@ -1211,12 +1243,11 @@
       return this.magnetEnd && Date.now() < this.magnetEnd;
     }
   };
+  __name(_PowerUpSystem, "PowerUpSystem");
+  var PowerUpSystem = _PowerUpSystem;
 
   // src/systems/ui/MenuSystem.js
-  var MenuSystem = class {
-    static {
-      __name(this, "MenuSystem");
-    }
+  var _MenuSystem = class _MenuSystem {
     constructor() {
       this.state = "title";
       this.levelSelection = 1;
@@ -1378,12 +1409,11 @@
       this.showCredits = show;
     }
   };
+  __name(_MenuSystem, "MenuSystem");
+  var MenuSystem = _MenuSystem;
 
   // src/entities/Boss.js
-  var Boss = class {
-    static {
-      __name(this, "Boss");
-    }
+  var _Boss = class _Boss {
     constructor(x, y, level) {
       this.x = x;
       this.y = y;
@@ -1504,12 +1534,11 @@
       return this.projectiles;
     }
   };
+  __name(_Boss, "Boss");
+  var Boss = _Boss;
 
   // src/levels/Level6.js
-  var Level6 = class {
-    static {
-      __name(this, "Level6");
-    }
+  var _Level6 = class _Level6 {
     constructor(gameWidth, gameHeight) {
       this.width = gameWidth;
       this.height = gameHeight;
@@ -1606,12 +1635,11 @@
       });
     }
   };
+  __name(_Level6, "Level6");
+  var Level6 = _Level6;
 
   // src/levels/Level7.js
-  var Level7 = class {
-    static {
-      __name(this, "Level7");
-    }
+  var _Level7 = class _Level7 {
     constructor(gameWidth, gameHeight) {
       this.width = gameWidth;
       this.height = gameHeight;
@@ -1886,12 +1914,11 @@
       return this.bosses;
     }
   };
+  __name(_Level7, "Level7");
+  var Level7 = _Level7;
 
   // src/levels/LevelManager.js
-  var LevelManager = class {
-    static {
-      __name(this, "LevelManager");
-    }
+  var _LevelManager = class _LevelManager {
     constructor() {
       this.level = 1;
       this.currentLevel = null;
@@ -2081,12 +2108,11 @@
       this.screenHeight = height;
     }
   };
+  __name(_LevelManager, "LevelManager");
+  var LevelManager = _LevelManager;
 
   // src/systems/ui/PauseMenu.js
-  var PauseMenu = class {
-    static {
-      __name(this, "PauseMenu");
-    }
+  var _PauseMenu = class _PauseMenu {
     constructor() {
       this.visible = false;
       this.canvas = document.getElementById("game-canvas");
@@ -2288,15 +2314,14 @@
       }
     }
   };
+  __name(_PauseMenu, "PauseMenu");
+  var PauseMenu = _PauseMenu;
   if (typeof window !== "undefined") {
     window.PauseMenu = PauseMenu;
   }
 
   // src/systems/AudioSystem.js
-  var AudioSystem = class {
-    static {
-      __name(this, "AudioSystem");
-    }
+  var _AudioSystem = class _AudioSystem {
     constructor() {
       this.enabled = false;
       this.musicEnabled = true;
@@ -2590,6 +2615,8 @@
       }
     }
   };
+  __name(_AudioSystem, "AudioSystem");
+  var AudioSystem = _AudioSystem;
   if (typeof window !== "undefined") {
     window.AudioSystem = AudioSystem;
   }
@@ -2682,52 +2709,32 @@
   });
   document.addEventListener("keyup", (e) => keys2[e.code] = false);
   function resizeCanvas() {
-    canvas.width = canvas.parentElement.clientWidth;
-    canvas.height = canvas.parentElement.clientHeight;
+    const oldWidth = canvas.width;
+    const oldHeight = canvas.height;
+    const newWidth = canvas.parentElement.clientWidth;
+    const newHeight = canvas.parentElement.clientHeight;
+    if (oldWidth === 0 || oldHeight === 0) {
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      return;
+    }
+    canvas.width = newWidth;
+    canvas.height = newHeight;
+    const scaleX = newWidth / oldWidth;
+    const scaleY = newHeight / oldHeight;
+    if (player && gameState && gameState.platforms) {
+      player.x = Math.min(Math.max(0, player.x * scaleX), canvas.width - player.width);
+      player.y = Math.min(Math.max(0, player.y * scaleY), canvas.height - player.height);
+      gameState.platforms.forEach((p) => {
+        p.y = Math.max(0, p.y * scaleY);
+      });
+    }
   }
   __name(resizeCanvas, "resizeCanvas");
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
   function updateUI() {
     const scoreEl = document.getElementById("score");
-    function resizeCanvas2() {
-      const oldWidth = canvas.width;
-      const oldHeight = canvas.height;
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-      const scaleX = canvas.width / oldWidth;
-      const scaleY = canvas.height / oldHeight;
-      if (player && gameState && gameState.platforms) {
-        player.x = Math.min(
-          Math.max(0, player.x * scaleX),
-          canvas.width - player.width
-        );
-        player.y = Math.min(
-          Math.max(0, player.y * scaleY),
-          canvas.height - player.height
-        );
-        gameState.platforms.forEach((p) => {
-          p.y = Math.max(0, p.y * scaleY);
-        });
-      }
-    }
-    __name(resizeCanvas2, "resizeCanvas");
-    function resizeCanvas2() {
-      const oldWidth = canvas.width;
-      const oldHeight = canvas.height;
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-      const scaleX = canvas.width / oldWidth;
-      const scaleY = canvas.height / oldHeight;
-      if (gameState && gameState.platforms && player) {
-        player.x *= scaleX;
-        player.y *= scaleY;
-        gameState.platforms.forEach((p) => {
-          p.y *= scaleY;
-        });
-      }
-    }
-    __name(resizeCanvas2, "resizeCanvas");
     const timerEl = document.getElementById("timer");
     const comboEl = document.getElementById("combo");
     const levelEl = document.getElementById("level");
