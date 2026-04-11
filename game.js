@@ -611,10 +611,12 @@ resizeCanvas();
 initLevel();
 render();
 
-// Expose functions globally for HTML onclick handlers (CRITICAL FOR BUNDLED VERSION)
-window.startGame = startGame;
-window.restartGame = restartGame;
-window.startNextLevel = startNextLevel;
-window.initLevel = initLevel;
+// CRITICAL EXPOSE TO GLOBAL (must be before bundle)
+Object.assign(window, {
+  startGame,
+  restartGame,
+  startNextLevel,
+  initLevel
+});
 
-console.log('NEON PROTOCOL v5.3 loaded! Functions exposed to window.');
+console.log('NEON PROTOCOL v5.3 loaded! Functions exposed.');
