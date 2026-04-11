@@ -584,6 +584,10 @@ function startGame() {
   document.getElementById('game-over-screen').classList.add('hidden');
   document.getElementById('menu-overlay')?.classList.add('hidden');
   
+  // Initialize audio on first interaction
+  audio.init();
+  audio.playMusic();
+  
   loadLevel(1);
   requestAnimationFrame(gameLoop);
 }
